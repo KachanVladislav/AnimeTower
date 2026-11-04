@@ -2,7 +2,7 @@
 
 set EXE_NAME=AnimeTower.exe
 set DIST_DIR=distribution\AnimeTower
-set EXE_BUILDED_DIR=build\Release
+set EXE_BUILDED_DIR=build\Dist\Release
 set RESOURCE_DIR=resource
 
 REM Build Release first (without console for distribution)

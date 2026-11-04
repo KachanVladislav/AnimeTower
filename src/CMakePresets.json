@@ -6,7 +6,7 @@
             "displayName": "Debug",
             "generator": "Visual Studio 18 2026",
             "architecture": "x64",
-            "binaryDir": "${sourceDir}/../build",
+            "binaryDir": "${sourceDir}/../build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_FLAGS": "/Zi /Od",
@@ -18,9 +18,22 @@
             "displayName": "Release",
             "generator": "Visual Studio 18 2026",
             "architecture": "x64",
-            "binaryDir": "${sourceDir}/../build",
+            "binaryDir": "${sourceDir}/../build/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_FLAGS": "/O2",
+                "CMAKE_CXX_FLAGS": "/O2"
+            }
+        },
+        {
+            "name": "dist",
+            "displayName": "Dist (no console)",
+            "generator": "Visual Studio 18 2026",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/../build/dist",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "BUILD_NO_CONSOLE": "ON",
                 "CMAKE_C_FLAGS": "/O2",
                 "CMAKE_CXX_FLAGS": "/O2"
             }
@@ -37,6 +50,12 @@
             "name": "release",
             "displayName": "Release",
             "configurePreset": "release",
+            "configuration": "Release"
+        },
+        {
+            "name": "dist",
+            "displayName": "Dist (no console)",
+            "configurePreset": "dist",
             "configuration": "Release"
         }
     ]

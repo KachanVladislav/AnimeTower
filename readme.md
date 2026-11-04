@@ -13,6 +13,9 @@ C++23 - for some stuff
 │   └── CMakePresets.json
 ├── resource/            # fonts and other resources
 ├── build/               # build output (gitignored)
+│   ├── Debug/           # Debug build (with console)
+│   ├── Release/         # Release build (with console)
+│   └── Dist/            # Dist build (no console)
 ├── distribution/        # release exe goes here (gitignored)
 ├── .vscode/             # F5 debug config
 ├── build.bat            # build script
@@ -34,7 +37,12 @@ build.bat -d       # Debug (with console, with symbols, no optimization)
 build.bat -dist    # Release without console (for distribution)
 ```
 
-Exe lands in `build/Release/` or `build/Debug/`.
+Exe lands in:
+- Debug: `build/Debug/Debug/AnimeTower.exe`
+- Release: `build/Release/Release/AnimeTower.exe`
+- Dist: `build/Dist/Release/AnimeTower.exe`
+
+Each build config uses a separate folder, so you can switch between Debug/Dist without cleaning.
 
 # distribution
 
