@@ -65,3 +65,9 @@ F5 saves all files, builds, and launches debugger.
 
 - CMake
 - Visual Studio 2022+ (MSVC)
+
+# license
+
+MIT © KachanVladislav — see [LICENSE](LICENSE)
+
+Uses [raylib](https://github.com/raysan5/raylib) (zlib/libpng license)

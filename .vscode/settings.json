@@ -9,5 +9,5 @@
         "*.c": "c",
         "*.cpp": "cpp"
     },
-    "cmake.sourceDirectory": "D:/useful/!projects_new/raylibStart/src"
+    "cmake.sourceDirectory": "${workspaceFolder}/src"
 }
