@@ -1,0 +1,34 @@
+# Build output
+build/
+distribution/
+
+# IDE files (keep .vscode for debug config)
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# CMake generated
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.vcxproj*
+*.vcxproj.filters
+
+# Compiled objects
+*.obj
+*.o
+*.lib
+*.dll
+*.exe
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temp files
+*.tmp
+*.log
+
+# Include .vscode (tracked separately)
+!.vscode/
