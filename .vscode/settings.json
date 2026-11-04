@@ -8,5 +8,6 @@
         "*.hpp": "cpp",
         "*.c": "c",
         "*.cpp": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "D:/useful/!projects_new/raylibStart/src"
 }

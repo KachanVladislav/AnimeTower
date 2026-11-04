@@ -3,6 +3,7 @@ setlocal
 
 REM Parse arguments
 set BUILD_CONFIG=Release
+set CMAKE_EXTRA_ARGS=
 
 :ARG_LOOP
 if "%1"=="" goto :BUILD
@@ -13,6 +14,12 @@ if /i "%1"=="-d" (
 )
 if /i "%1"=="-r" (
     set BUILD_CONFIG=Release
+    shift
+    goto :ARG_LOOP
+)
+if /i "%1"=="-dist" (
+    set BUILD_CONFIG=Release
+    set CMAKE_EXTRA_ARGS=-DBUILD_NO_CONSOLE=ON
     shift
     goto :ARG_LOOP
 )
@@ -38,7 +45,7 @@ cd build
 
 REM Configure CMake (use VS 18 2026 which is default)
 echo Configuring %BUILD_CONFIG% build...
-cmake ../src -G "Visual Studio 18 2026" -A x64
+cmake ../src -G "Visual Studio 18 2026" -A x64 %CMAKE_EXTRA_ARGS%
 
 if %ERRORLEVEL% neq 0 (
     echo ERROR: CMake configuration failed

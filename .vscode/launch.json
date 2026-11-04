@@ -5,7 +5,7 @@
             "name": "Debug",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Debug/raylibStart.exe",
+            "program": "${workspaceFolder}/build/Debug/AnimeTower.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -18,7 +18,7 @@
             "name": "Release",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Release/raylibStart.exe",
+            "program": "${workspaceFolder}/build/Release/AnimeTower.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -26,6 +26,19 @@
             "console": "externalTerminal",
             "saveAllBeforeStart": true,
             "preLaunchTask": "Build Release"
+        },
+        {
+            "name": "Dist (no console)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Release/AnimeTower.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "internalConsole",
+            "saveAllBeforeStart": true,
+            "preLaunchTask": "Build Dist"
         }
     ]
 }

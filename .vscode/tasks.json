@@ -21,6 +21,14 @@
             "problemMatcher": ["$msCompile"]
         },
         {
+            "label": "Build Dist",
+            "type": "shell",
+            "command": "${workspaceFolder}/build.bat",
+            "args": ["-dist"],
+            "group": "build",
+            "problemMatcher": ["$msCompile"]
+        },
+        {
             "label": "Clean Build",
             "type": "shell",
             "command": "rmdir",
