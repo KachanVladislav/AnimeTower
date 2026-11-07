@@ -17,18 +17,21 @@ namespace lwp
         float getY_Top() const { return bottomLeftPos.y + size.y; }
         float getX_Right() const { return bottomLeftPos.x + size.x; }
         float getX_Left() const { return bottomLeftPos.x; }
-        void setY_Bottom(float y) { bottomLeftPos.y = y; }
-        void move(const Vector2f &delta)
-        {
-            bottomLeftPos.x += delta.x;
-            bottomLeftPos.y += delta.y;
-        }
+        void setY_Bottom(float val)  { bottomLeftPos.y = val; }
+        void setY_Top(float val)  { bottomLeftPos.y = val - size.y; }
+        void setX_Right(float val)  { bottomLeftPos.x = val - size.x; }
+        void setX_Left(float val)  { bottomLeftPos.x = val; }
         Vector2f getCenter() const
         {
             return Vector2f{
                 bottomLeftPos.x + size.x / 2.f,
                 bottomLeftPos.y + size.y / 2.f,
             };
+        }
+        void move(const Vector2f &delta)
+        {
+            bottomLeftPos.x += delta.x;
+            bottomLeftPos.y += delta.y;
         }
         static Rectangle build_UpLeft(Vector2f pos, Vector2f size)
         {
@@ -47,7 +50,7 @@ namespace lwp
         }
     };
 
-    struct RigidBody
+    struct RigidBody2D
     {
         Rectangle box{};
         Vector2f speed{};

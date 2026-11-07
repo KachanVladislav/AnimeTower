@@ -1,85 +1,24 @@
 #include "raylib.h"
 #include "InputSystem.h"
-#include "WidgetInputSystemTest.h"
-
-#include "lwp/lwp.h"
-#include <span>
-
-struct PlatformBuilderSettings
-{
-    float platformWidth = 0;
-    float screenWidth = 0;
-    static PlatformBuilderSettings buildDefault(float screenWidth)
-    {
-        PlatformBuilderSettings res;
-        res.platformWidth = 30.f;
-        res.screenWidth = screenWidth;
-        return res;
-    }
-};
+#include "Console.h"
+#include "atPhysics.h"
+#include "atCamera.h"
+#include "hud/hud.h"
 
 struct PlatformBuilder
 {
-    PlatformBuilderSettings settings;
-    lwp::Rectangle buildHorizontal(lwp::Vector2f pos, float width)
+    static inline const float PLATFORM_WIDTH = 0.5f;
+    lwp::Rectangle buildHorizontalRight(lwp::Vector2f pos, float width)
     {
-        return lwp::Rectangle::build_UpLeft(pos, {pos.x + width, settings.platformWidth});
+        return lwp::Rectangle::build_UpLeft(pos, {width, PLATFORM_WIDTH});
+    }
+    lwp::Rectangle buildHorizontalLeft(lwp::Vector2f pos, float width)
+    {
+        return buildHorizontalRight(lwp::Vector2f{pos.x - width, pos.y}, width);
     }
 };
 
-struct AnimeTowerPhysics
-{
-    static void updateBodySpeedToInput(lwp::RigidBody &body, const InputSystemResult &input)
-    {
-        const float MAX_SPEED = 20;
-        const float JUMP_SPEED = 50;
-
-        if (body.isOnFloor())
-        {
-            if (input.direction)
-            {
-                if (*input.direction == InputSystemDirection::right)
-                    body.speed.x = MAX_SPEED;
-                else
-                    body.speed.x = -MAX_SPEED;
-            }
-            else
-            {
-                body.speed.x = 0;
-            }
-            if (input.action)
-            {
-                if (*input.action == InputSystemAction::jump)
-                    body.speed.y = JUMP_SPEED;
-            }
-        }
-    }
-
-    static void updatePhysics(lwp::RigidBody &player, std::span<lwp::Rectangle> staticObjects, float dT)
-    {
-        const float g = 10.f;
-
-        float playerBottomBefore = player.box.getY_Bottom();
-
-        player.speed.y = player.speed.y - g * dT;
-        player.applySpeedToBoxPos(dT);
-        player.onFloor = false;
-
-        float playerBottom = player.box.getY_Bottom();
-        for (const auto box : staticObjects)
-        {
-            if (playerBottomBefore >= box.getY_Top() && playerBottom <= box.getY_Top()) // y-level
-            {
-                bool notAligned_x = player.box.getX_Right() < box.getX_Left() || player.box.getX_Left() > box.getX_Right();
-                if (!notAligned_x) // x-level
-                    player.setOnFloor(box.getY_Top());
-            }
-        }
-    }
-
-};
-
-void drawBoxes(std::span<const lwp::Rectangle> objects, Color color)
+void drawRectangles(std::span<const lwp::Rectangle> objects, Color color)
 {
     for (const auto &box : objects)
     {
@@ -87,73 +26,53 @@ void drawBoxes(std::span<const lwp::Rectangle> objects, Color color)
     }
 }
 
-#include <print>
-class Console
-{
-public:
-    template <typename... Args>
-    static void log(std::format_string<Args...> fmt, Args &&...args)
-    {
-        std::print(fmt, std::forward<Args>(args)...);
-    }
-
-    static void logBox(const lwp::Rectangle &box)
-    {
-        log("x {:.1f} y {:.1f} bottom {:.1f}\n", box.bottomLeftPos.x, box.bottomLeftPos.y, box.getY_Bottom());
-    }
-};
-
 int main()
 {
     const int screenWidth = 800;
     const int screenHeight = 450;
+    const float screenWidth_lwp = 20;
 
     InputSystem inputSystem;
-
-    Camera2D camera = {0};
-    camera.target = Vector2{0, 0};
-    camera.offset = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
-    camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    HUD hud;
+    atCamera camera;
+    camera.initialize(screenWidth, screenHeight, screenWidth_lwp);
 
     PlatformBuilder platformBuilder;
-    platformBuilder.settings = PlatformBuilderSettings::buildDefault((float)screenWidth);
 
-    const float PLATFORM_WIDTH = 30.f;
     lwp::Rectangle staticBoxes[] = {
-        lwp::Rectangle::build_BottomCenter({100.f, 300.f}, {50.f, 100.f}),
-        lwp::Rectangle::build_BottomCenter({500.f, 300.f}, {50.f, 100.f}),
-        platformBuilder.buildHorizontal({50.f, 50.f}, 500.f),
-        platformBuilder.buildHorizontal({320.f, 150.f}, 200.f)};
+        // lwp::Rectangle::build_BottomCenter({100.f, 300.f}, {50.f, 100.f}),
+        // lwp::Rectangle::build_BottomCenter({500.f, 300.f}, {50.f, 100.f}),
+        platformBuilder.buildHorizontalLeft({0.f, 2.7f}, 10.f),
+        platformBuilder.buildHorizontalRight({5.f, 2.7f}, 10.f),
+        platformBuilder.buildHorizontalRight({7.f, 5.4f}, 3.f),
+        platformBuilder.buildHorizontalRight({-2.f, 1.5f}, 20.f)};
 
-    lwp::RigidBody player;
-    player.box = lwp::Rectangle::build_BottomCenter({100.f, screenHeight - 2 * PLATFORM_WIDTH}, {20.f, 40.f});
+    lwp::RigidBody2D player;
+    player.box = lwp::Rectangle::build_BottomCenter({1.1f, 2.f}, {1.f, 2.f});
 
     InitWindow(screenWidth, screenHeight, "AnimeTower");
+    hud.initialize();
     SetTargetFPS(120);
-
-    Font font = LoadFontEx("./resource/GoogleSans-VariableFont_GRAD,opsz,wght.ttf", 64, NULL, 0);
-    WidgetInputSystemTest widgetInput;
-    widgetInput.settings = WidgetInputSystemTestSettings::buildDefault(Vector2{10.f, 30.f}, font);
 
     while (!WindowShouldClose())
     {
+        float dT = GetFrameTime(); //if less than cap than cap?
         InputSystemResult input = inputSystem.update();
-        AnimeTowerPhysics::updateBodySpeedToInput(player, input);
-        AnimeTowerPhysics::updatePhysics(player, staticBoxes, 0.1f); // todo add dT
-        Console::logBox(player.box);
+        atPhysics::applyInputToRigidBody(player, input);
+        atPhysics::updatePhysics(player, staticBoxes, dT);
+        // Console::logRectangle("", player.box);
 
-        camera.target = Vector2{player.box.bottomLeftPos.x, -player.box.bottomLeftPos.y};
+        camera.setTarget_lwp(player.box.getCenter());
+
         BeginDrawing();
 
-        BeginMode2D(camera);
+        BeginMode2D(camera.camera);
         ClearBackground(RAYWHITE);
-        drawBoxes(staticBoxes, GREEN);
-        drawBoxes({&player.box, 1}, PINK);
+        drawRectangles(staticBoxes, GREEN);
+        drawRectangles({&player.box, 1}, PINK);
         EndMode2D();
 
-        DrawFPS(10, 10);
-        widgetInput.draw(input);
+        hud.draw(input);
 
         EndDrawing();
     }

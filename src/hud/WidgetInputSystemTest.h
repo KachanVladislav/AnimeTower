@@ -1,6 +1,6 @@
 #pragma once
 #include "raylib.h"
-#include "InputSystem.h"
+#include "../InputSystem.h"
 
 struct WidgetInputSystemTestSettings
 {

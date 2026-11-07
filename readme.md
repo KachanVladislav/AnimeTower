@@ -3,6 +3,12 @@
 Just a raylib project. Window opens, stuff renders.
 C++23 - for some stuff
 
+# code
+```
+at - prefix, as AnimeTower (ex. atPhysics.h)
+lwp - lightweight physics
+```
+
 # structure
 ```
 ./
