@@ -2,38 +2,85 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Debug",
+            "label": "Build Debug AnimeTower",
             "type": "shell",
-            "command": "${workspaceFolder}/build.bat",
-            "args": ["-d"],
+            "command": "cmake --preset debug ; cmake --build --preset debug --target AnimeTower",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": ["$msCompile"]
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
         },
         {
-            "label": "Build Release",
+            "label": "Build Release AnimeTower",
             "type": "shell",
-            "command": "${workspaceFolder}/build.bat",
-            "args": ["-r"],
-            "group": "build",
-            "problemMatcher": ["$msCompile"]
+            "command": "cmake --preset release ; cmake --build --preset release --target AnimeTower",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
         },
         {
-            "label": "Build Dist",
+            "label": "Build Dist AnimeTower",
             "type": "shell",
-            "command": "${workspaceFolder}/build.bat",
-            "args": ["-dist"],
-            "group": "build",
-            "problemMatcher": ["$msCompile"]
+            "command": "cmake --preset dist ; cmake --build --preset dist --target AnimeTower",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
         },
         {
-            "label": "Clean Build",
+            "label": "Build Debug AnimeTower_Tests",
             "type": "shell",
-            "command": "rmdir",
-            "args": ["/s", "/q", "${workspaceFolder}/build"],
-            "problemMatcher": []
+            "command": "cmake --preset debug ; cmake --build --preset debug --target AnimeTower_Tests",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "label": "Build Release AnimeTower_Tests",
+            "type": "shell",
+            "command": "cmake --preset release ; cmake --build --preset release --target AnimeTower_Tests",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "label": "Delete Build",
+            "type": "shell",
+            "command": "if (Test-Path '${workspaceFolder}/build') { Remove-Item -Recurse -Force '${workspaceFolder}/build' }",
+            "group": "build"
         }
     ]
 }

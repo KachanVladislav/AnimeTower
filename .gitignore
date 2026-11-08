@@ -1,8 +1,5 @@
 # Build output
 build/
-build/Debug/
-build/Release/
-build/Dist/
 distribution/
 
 # IDE files (keep .vscode for debug config)

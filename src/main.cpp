@@ -4,6 +4,7 @@
 #include "atPhysics.h"
 #include "atCamera.h"
 #include "hud/hud.h"
+#include "Renderer_lwpToRaylib.h"
 
 struct PlatformBuilder
 {
@@ -18,17 +19,60 @@ struct PlatformBuilder
     }
 };
 
-void drawRectangles(std::span<const lwp::Rectangle> objects, Color color)
-{
-    for (const auto &box : objects)
-    {
-        DrawRectangleV({box.bottomLeftPos.x, -box.bottomLeftPos.y - box.size.y}, {box.size.x, box.size.y}, color);
-    }
-}
+// #include "PhysicsTests/PhysicsTest_Result.h"
+// #include "PhysicsTests/PhysicsTest_Visualizer.h"
+
+
+
+
+
+
+// PhysicsTest_Result PhysicsTestRun_fallOnFloor()
+// {
+//     PhysicsTest_Result result;
+//     PhysicsTest_VisualizerData &physicsData = result.physicsData;
+//     physicsData.fps = 120;
+
+//     PlatformBuilder platformBuilder;
+//     physicsData.staticPlatforms = {
+//         // lwp::Rectangle::build_BottomCenter({100.f, 300.f}, {50.f, 100.f}),
+//         // lwp::Rectangle::build_BottomCenter({500.f, 300.f}, {50.f, 100.f}),
+//         platformBuilder.buildHorizontalLeft({0.f, 2.7f}, 10.f),
+//         platformBuilder.buildHorizontalRight({5.f, 2.7f}, 10.f),
+//         platformBuilder.buildHorizontalRight({7.f, 5.4f}, 3.f),
+//         platformBuilder.buildHorizontalRight({-2.f, 1.5f}, 20.f)};
+
+//     lwp::RigidBody2D player;
+//     player.box = lwp::Rectangle::build_BottomCenter({1.1f, 2.f}, {1.f, 2.f});
+
+//     float dT = 1 / (float)physicsData.fps;
+//     for (float time = 0; time < 3; time += dT)
+//     {
+//         InputSystemResult input;
+//         atPhysics::applyInputToRigidBody(player, input);
+//         atPhysics::updatePhysics(player, physicsData.staticPlatforms, dT);
+
+//         physicsData.inputs.push_back(input);
+//         physicsData.playerOverFrames.push_back(player);
+//     }
+
+//     return result;
+// }
+
+// int mainTests()
+// {
+//     PhysicsTest_Result testResult = PhysicsTestRun_fallOnFloor();
+
+//     PhysicsTest_Visualizer vizualizer;
+//     vizualizer.initialize();
+//     vizualizer.vizualize(testResult.physicsData.buildView());
+//     return 0;
+// }
 
 int main()
 {
     const int screenWidth = 800;
+    // const int screenWidth = 80;
     const int screenHeight = 450;
     const float screenWidth_lwp = 20;
 
@@ -56,7 +100,7 @@ int main()
 
     while (!WindowShouldClose())
     {
-        float dT = GetFrameTime(); //if less than cap than cap?
+        float dT = GetFrameTime(); // if less than cap than cap?
         InputSystemResult input = inputSystem.update();
         atPhysics::applyInputToRigidBody(player, input);
         atPhysics::updatePhysics(player, staticBoxes, dT);
@@ -68,8 +112,8 @@ int main()
 
         BeginMode2D(camera.camera);
         ClearBackground(RAYWHITE);
-        drawRectangles(staticBoxes, GREEN);
-        drawRectangles({&player.box, 1}, PINK);
+        Renderer_lwpToRaylib::drawRectangles(staticBoxes, GREEN);
+        Renderer_lwpToRaylib::drawRectangles({&player.box, 1}, PINK);
         EndMode2D();
 
         hud.draw(input);
