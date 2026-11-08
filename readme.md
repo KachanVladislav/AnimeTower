@@ -21,7 +21,7 @@ git clone --recurse-submodules <repo-url>
 
 # Distribution (easy way to build and run)
 
-* run ```dist.bat```
+* run `dist.bat`
 * it creates:
 ```
 ./
@@ -31,6 +31,13 @@ git clone --recurse-submodules <repo-url>
     |    └── AnimeTower.exe                 # Desired .exe
     └── AnimeTower_YYYY-MM-DD_HH-MM.zip     # .zip of AnimeTower folder
 ```
+* might return an error (known issue):
+  * Microsoft Defender scans the freshly built `.exe` and blocks archiving
+  * `AnimeTower.exe` works fine, only `.zip` created without `AnimeTower.exe`
+  * to fix(`YOUR RISKS`, if you need): exclude project folder from Defender scanning (run PowerShell **as Admin**):
+    ```powershell
+    Add-MpPreference -ExclusionPath "D:\useful\!projects_new\AnimeTower"
+    ``` 
 
 # Project structure
 ```
