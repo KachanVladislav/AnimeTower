@@ -12,19 +12,22 @@ add_subdirectory(../3rdParty/raylib ${CMAKE_BINARY_DIR}/raylib)
 # Creates an executable target with common settings (raylib, console options)
 #
 # Usage:
-#   add_game_executable(<target_name> <main_file> [NO_CONSOLE])
+#   add_game_executable(<target_name> <sources...> [NO_CONSOLE])
 #
 # Examples:
 #   add_game_executable(AnimeTower main.cpp)
-#   add_game_executable(AnimeTower_Tests main_Tests.cpp)
+#   add_game_executable(AnimeTower_Tests main_Tests.cpp PhysicsTests/PhysicsTest.cpp)
 #   add_game_executable(AnimeTower_Dist main.cpp NO_CONSOLE)
 # =============================================================================
-function(add_game_executable TARGET_NAME MAIN_FILE)
+function(add_game_executable TARGET_NAME)
     set(options NO_CONSOLE)
-    cmake_parse_arguments(PARSE_ARGV 2 ARG "${options}" "" "")
-    
+    cmake_parse_arguments(PARSE_ARGV 1 ARG "${options}" "" "")
+
+    # First unparsed argument is sources
+    set(SOURCES ${ARG_UNPARSED_ARGUMENTS})
+
     # Create executable
-    add_executable(${TARGET_NAME} ${MAIN_FILE})
+    add_executable(${TARGET_NAME} ${SOURCES})
     
     # Link raylib
     target_link_libraries(${TARGET_NAME} PRIVATE raylib)
@@ -52,8 +55,13 @@ endif()
 # =============================================================================
 option(BUILD_TESTS_NO_CONSOLE "Build tests without console window (Windows GUI subsystem)" OFF)
 
+set(TEST_SOURCES
+    main_Tests.cpp
+    PhysicsTests/Tests.cpp
+)
+
 if(BUILD_TESTS_NO_CONSOLE)
-    add_game_executable(${PROJECT_NAME}_Tests main_Tests.cpp NO_CONSOLE)
+    add_game_executable(${PROJECT_NAME}_Tests ${TEST_SOURCES} NO_CONSOLE)
 else()
-    add_game_executable(${PROJECT_NAME}_Tests main_Tests.cpp)
+    add_game_executable(${PROJECT_NAME}_Tests ${TEST_SOURCES})
 endif()

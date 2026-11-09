@@ -16,21 +16,16 @@ class PhysicsTest_Visualizer
     } settings;
 
 public:
-    void initialize()
-    {
-        this->settings = settings;
-        camera.initialize(settings.screenWidth, settings.screenHeight, settings.screenWidth_lwp);
-        InitWindow(settings.screenWidth, settings.screenHeight, "testAnimeTower");
-        hud.initialize();
-    }
-
-    void vizualize(const PhysicsTest_VisualizerData_View &data)
+    void vizualize(const PhysicsTest_PhysicsData &data)
     {
         if (isVizualizedNotValidData(data))
         {
             return;
         }
-
+        
+        camera.initialize(settings.screenWidth, settings.screenHeight, settings.screenWidth_lwp);
+        InitWindow(settings.screenWidth, settings.screenHeight, "testAnimeTower");
+        hud.initialize();
         SetTargetFPS(data.fps);
 
         size_t currentIndex = 0;
@@ -62,17 +57,18 @@ public:
             if (currentIndex >= maxIndex)
                 currentIndex = 0;
         }
+        CloseWindow();
     }
 
 private:
-    bool isVizualizedNotValidData(const PhysicsTest_VisualizerData_View &data)
+    bool isVizualizedNotValidData(const PhysicsTest_PhysicsData &data)
     {
         if (data.inputs.size() != data.playerOverFrames.size() || data.inputs.size() == 0)
         {
             std::string errorMessage = std::format("Wrong size {}/{}",
                                                    data.inputs.size(),
                                                    data.playerOverFrames.size());
-
+            InitWindow(settings.screenWidth, settings.screenHeight, "testAnimeTower_NotValidArgs");
             while (!WindowShouldClose())
             {
                 BeginDrawing();

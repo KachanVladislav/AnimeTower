@@ -12,7 +12,8 @@ int main()
     const int screenWidth = 800;
     const int screenHeight = 450;
     const float screenWidth_lwp = 20;
-
+    SetTraceLogLevel(LOG_WARNING);//raylib  logs
+    
     InputSystem inputSystem;
     HUD hud;
     atCamera camera;

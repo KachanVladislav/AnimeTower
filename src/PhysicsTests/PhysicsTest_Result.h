@@ -5,52 +5,47 @@
 #include "../InputSystem.h"
 #include "../lwp/lwp.h"
 
-struct PhysicsTest_VisualizerData_View
-{
-    int fps = 120;
-    std::span<const InputSystemResult> inputs{};
-    std::span<const lwp::Rectangle> staticPlatforms{};
-    std::span<const lwp::RigidBody2D> playerOverFrames{};
-};
-
-struct PhysicsTest_VisualizerData
+struct PhysicsTest_PhysicsData
 {
     std::vector<InputSystemResult> inputs{};
     std::vector<lwp::RigidBody2D> playerOverFrames{};
     std::vector<lwp::Rectangle> staticPlatforms{};
     int fps = 120;
-    PhysicsTest_VisualizerData_View buildView()
+};
+
+struct PhysicsTest_MessageData
+{
+    std::string text;
+    enum class Type
     {
-        PhysicsTest_VisualizerData_View res;
-        res.fps = fps;
-        res.inputs = inputs;
-        res.staticPlatforms = staticPlatforms;
-        res.playerOverFrames = playerOverFrames;
-        return res;
+        fail_assert,
+        text
+    } type = Type::text;
+    static PhysicsTest_MessageData buildText(std::string_view text)
+    {
+        return PhysicsTest_MessageData{std::string(text), Type::text};
+    }
+    static PhysicsTest_MessageData buildFail(std::string_view text)
+    {
+        return PhysicsTest_MessageData{std::string(text), Type::fail_assert};
     }
 };
 
 struct PhysicsTest_Result
 {
-    PhysicsTest_VisualizerData physicsData;
+    PhysicsTest_PhysicsData physicsData;
+    std::vector<PhysicsTest_MessageData> messages;
+    std::string testName;
     bool isPassed = true;
-    struct MessageData
+    void log(int frameCounter, std::string_view text)
     {
-        size_t idx = 0;
-        std::string message;
-        enum class Type
-        {
-            fail,
-            text
-        } type = Type::text;
-        static MessageData buildText(size_t idx, std::string_view text)
-        {
-            return MessageData{idx, std::string(text), Type::text};
-        }
-    };
-    std::vector<MessageData> messages;
-    void log(size_t idx, std::string_view text)
+        messages.push_back(PhysicsTest_MessageData::buildText(text));
+    }
+    void assert(bool isTrue, std::string_view text)
     {
-        messages.push_back(MessageData::buildText(idx, text));
+        if (isTrue)
+            return;
+        isPassed = false;
+        messages.push_back(PhysicsTest_MessageData::buildFail(text));
     }
 };
