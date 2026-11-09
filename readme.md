@@ -39,6 +39,14 @@ git clone --recurse-submodules <repo-url>
     Add-MpPreference -ExclusionPath "D:\useful\!projects_new\AnimeTower"
     ``` 
 
+# Verification before commit
+
+`run_all.bat` sequantially `build` and `executes:
+* debug: `AnimeTower`, `AnimeTower_Tests`
+* release: `AnimeTower`, `AnimeTower_Tests`
+* dist: `AnimeTower`
+
+
 # Project structure
 ```
 ./
