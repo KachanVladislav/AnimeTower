@@ -70,5 +70,4 @@ echo ===================================================
 echo [Complete] Creating ZIP archive: %ZIP_NAME%
 echo ===================================================
 echo.
-echo 
 exit /b 0

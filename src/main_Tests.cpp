@@ -3,19 +3,8 @@
 #include "atPhysics.h"
 #include "PhysicsTests/PhysicsTest_Result.h"
 #include "PhysicsTests/PhysicsTest_Visualizer.h"
+#include "atPlatformBuilder.h"
 
-struct PlatformBuilder
-{
-    static inline const float PLATFORM_WIDTH = 0.5f;
-    lwp::Rectangle buildHorizontalRight(lwp::Vector2f pos, float width)
-    {
-        return lwp::Rectangle::build_UpLeft(pos, {width, PLATFORM_WIDTH});
-    }
-    lwp::Rectangle buildHorizontalLeft(lwp::Vector2f pos, float width)
-    {
-        return buildHorizontalRight(lwp::Vector2f{pos.x - width, pos.y}, width);
-    }
-};
 
 PhysicsTest_Result PhysicsTestRun_fallOnFloor()
 {
@@ -23,7 +12,7 @@ PhysicsTest_Result PhysicsTestRun_fallOnFloor()
     PhysicsTest_VisualizerData &physicsData = result.physicsData;
     physicsData.fps = 120;
 
-    PlatformBuilder platformBuilder;
+    atPlatformBuilder platformBuilder;
     physicsData.staticPlatforms = {
         // lwp::Rectangle::build_BottomCenter({100.f, 300.f}, {50.f, 100.f}),
         // lwp::Rectangle::build_BottomCenter({500.f, 300.f}, {50.f, 100.f}),
