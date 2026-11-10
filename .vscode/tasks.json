@@ -7,7 +7,6 @@
             "command": "cmake --preset debug ; cmake --build --preset debug --target AnimeTower",
             "group": {
                 "kind": "build",
-                "isDefault": true
             },
             "options": {
                 "cwd": "${workspaceFolder}/src"
@@ -22,7 +21,6 @@
             "command": "cmake --preset release ; cmake --build --preset release --target AnimeTower",
             "group": {
                 "kind": "build",
-                "isDefault": true
             },
             "options": {
                 "cwd": "${workspaceFolder}/src"
@@ -37,7 +35,6 @@
             "command": "cmake --preset dist ; cmake --build --preset dist --target AnimeTower",
             "group": {
                 "kind": "build",
-                "isDefault": true
             },
             "options": {
                 "cwd": "${workspaceFolder}/src"
@@ -52,7 +49,6 @@
             "command": "cmake --preset debug ; cmake --build --preset debug --target AnimeTower_Tests",
             "group": {
                 "kind": "build",
-                "isDefault": true
             },
             "options": {
                 "cwd": "${workspaceFolder}/src"
@@ -65,6 +61,20 @@
             "label": "Build Release AnimeTower_Tests",
             "type": "shell",
             "command": "cmake --preset release ; cmake --build --preset release --target AnimeTower_Tests",
+            "group": {
+                "kind": "build",
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "label": "Build default - debug all",
+            "type": "shell",
+            "command": "cmake --preset debug ; cmake --build --preset debug --target AnimeTower_Tests ; cmake --build --preset debug --target AnimeTower",
             "group": {
                 "kind": "build",
                 "isDefault": true

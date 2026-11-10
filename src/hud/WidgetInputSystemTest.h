@@ -5,7 +5,7 @@
 struct WidgetInputSystemTestSettings
 {
     int spacing = 0;
-    int fontSize[3] {};
+    float fontSize[3] {};
     Vector2 keyPos[3]{};
     Vector2 keySize;
     Vector2 textPos[3]{};

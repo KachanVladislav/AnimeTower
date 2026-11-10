@@ -23,7 +23,7 @@ public:
             return;
         }
         
-        camera.initialize(settings.screenWidth, settings.screenHeight, settings.screenWidth_lwp);
+        camera.initialize((float)settings.screenWidth, (float)settings.screenHeight, settings.screenWidth_lwp);
         InitWindow(settings.screenWidth, settings.screenHeight, "testAnimeTower");
         hud.initialize();
         SetTargetFPS(data.fps);

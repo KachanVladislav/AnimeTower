@@ -37,7 +37,7 @@ struct PhysicsTest_Result
     std::vector<PhysicsTest_MessageData> messages;
     std::string testName;
     bool isPassed = true;
-    void log(int frameCounter, std::string_view text)
+    void log(std::string_view text)
     {
         messages.push_back(PhysicsTest_MessageData::buildText(text));
     }
