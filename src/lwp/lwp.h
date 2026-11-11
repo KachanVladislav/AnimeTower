@@ -13,6 +13,7 @@ namespace lwp
     {
         Vector2f bottomLeftPos{}; // bottom-left corner (physics)
         Vector2f size{};          // width, height
+        Vector2f getPos_TopLeft() const { return {bottomLeftPos.x, bottomLeftPos.y + size.y}; }
         float getY_Bottom() const { return bottomLeftPos.y; }
         float getY_Top() const { return bottomLeftPos.y + size.y; }
         float getX_Right() const { return bottomLeftPos.x + size.x; }

@@ -35,7 +35,6 @@ struct PhysicsTest_Result
 {
     PhysicsTest_PhysicsData physicsData;
     std::vector<PhysicsTest_MessageData> messages;
-    std::string testName;
     bool isPassed = true;
     void log(std::string_view text)
     {

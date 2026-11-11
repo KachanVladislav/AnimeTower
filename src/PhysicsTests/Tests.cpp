@@ -2,10 +2,43 @@
 #include "../atPlatformBuilder.h"
 #include "../atPhysics.h"
 
+PHYSICS_TEST(collisionLeft)
+{
+    PhysicsTest_Result result;
+
+    PhysicsTest_PhysicsData &physicsData = result.physicsData;
+    physicsData.fps = 120;
+
+    atPlatformBuilder platformBuilder;
+    physicsData.staticPlatforms = {
+        platformBuilder.buildHorizontalRight({-3.f, 0.0f}, 6.f),
+        platformBuilder.buildHorizontalLeft({-1.f, 1.4f}, 2.f),
+    };
+
+    lwp::RigidBody2D player;
+    player.box = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
+
+    float dT = 1 / (float)physicsData.fps;
+    InputSystemResult input;
+    input.direction = InputSystemDirection::left;
+    for (float time = 0; time < 1; time += dT)
+    {
+        atPhysics::applyInputToRigidBody(player, input);
+        atPhysics::updatePhysics(player, physicsData.staticPlatforms, dT);
+
+        physicsData.inputs.push_back(input);
+        physicsData.playerOverFrames.push_back(player);
+    }
+
+    bool isPlayerCollided = player.box.getCenter().x > -1.f;
+    result.assert(isPlayerCollided, "Player went through collision");
+
+    return result;
+}
+
 PHYSICS_TEST(fallOnFloor)
 {
     PhysicsTest_Result result;
-    result.testName = "floor not faling";
     PhysicsTest_PhysicsData &physicsData = result.physicsData;
     physicsData.fps = 120;
 
@@ -37,7 +70,6 @@ PHYSICS_TEST(fallOnFloor)
 PHYSICS_TEST(jumpTricky)
 {
     PhysicsTest_Result result;
-    result.testName = "jump tricky";
     PhysicsTest_PhysicsData &physicsData = result.physicsData;
     physicsData.fps = 120;
 

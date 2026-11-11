@@ -6,18 +6,27 @@
 #include "hud/hud.h"
 #include "Renderer_lwpToRaylib.h"
 #include "atPlatformBuilder.h"
+#include "atTextureLoader.h"
+
+struct atTextures
+{
+    Texture2D playerTexture;
+    void load(atTextureLoader &textureLoader)
+    {
+        playerTexture = textureLoader.loadTextureFromFile("./resource/elBuba.png");
+    }
+    void unload()
+    {
+        UnloadTexture(playerTexture);
+    }
+};
 
 int main()
 {
     const int screenWidth = 800;
     const int screenHeight = 450;
     const float screenWidth_lwp = 20;
-    SetTraceLogLevel(LOG_WARNING);//raylib  logs
-    
-    InputSystem inputSystem;
-    HUD hud;
-    atCamera camera;
-    camera.initialize(screenWidth, screenHeight, screenWidth_lwp);
+    SetTraceLogLevel(LOG_WARNING); // raylib  logs
 
     atPlatformBuilder platformBuilder;
 
@@ -30,28 +39,43 @@ int main()
         platformBuilder.buildHorizontalRight({-2.f, 1.5f}, 20.f)};
 
     lwp::RigidBody2D player;
-    player.box = lwp::Rectangle::build_BottomCenter({1.1f, 2.f}, {1.f, 2.f});
+    lwp::Vector2f playerSize{1.f, 2.f};
+    player.box = lwp::Rectangle::build_BottomCenter({1.1f, 2.f}, playerSize);
 
     InitWindow(screenWidth, screenHeight, "AnimeTower");
-    hud.initialize();
     SetTargetFPS(120);
 
+    InputSystem inputSystem;
+
+    atTextureLoader textureLoader;
+    textureLoader.load();
+    atTextures textures;
+    textures.load(textureLoader);
+
+    atCamera camera;
+    camera.initialize(screenWidth, screenHeight, screenWidth_lwp);
+
+    HUD hud;
+    hud.initialize();
+
+    bool currentDirectionToRight = true;
     while (!WindowShouldClose())
     {
         float dT = GetFrameTime(); // if less than cap than cap?
         InputSystemResult input = inputSystem.update();
         atPhysics::applyInputToRigidBody(player, input);
         atPhysics::updatePhysics(player, staticBoxes, dT);
-        // Console::logRectangle("", player.box);
-
-        camera.setTarget_lwp(player.box.getCenter());
 
         BeginDrawing();
 
+        camera.setTarget_lwp(player.box.getCenter());
         BeginMode2D(camera.camera);
-        ClearBackground(RAYWHITE);
+        ClearBackground(LIGHTGRAY);
         Renderer_lwpToRaylib::drawRectangles(staticBoxes, GREEN);
-        Renderer_lwpToRaylib::drawRectangles({&player.box, 1}, PINK);
+        // Renderer_lwpToRaylib::drawRectangles({&player.box, 1}, PINK);
+        if (input.direction)
+            currentDirectionToRight = (*input.direction == InputSystemDirection::right);
+        Renderer_lwpToRaylib::drawTexture_sameHigh(player.box, textures.playerTexture, currentDirectionToRight);
         EndMode2D();
 
         hud.draw(input);
@@ -59,6 +83,8 @@ int main()
         EndDrawing();
     }
 
+    textures.unload();
+    textureLoader.unload();
     CloseWindow();
 
     return 0;

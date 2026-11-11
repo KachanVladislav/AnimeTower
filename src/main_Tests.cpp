@@ -13,9 +13,9 @@ int main()
     {
         PhysicsTest_Result testResult = test.func();
         if(testResult.isPassed)
-            Console::log("[TEST PASSED] {}\n", testResult.testName);
+            Console::log("[TEST PASSED] {}\n", test.name);
         else
-            Console::log("[TEST FAIL] {}\n", testResult.testName);
+            Console::log("[TEST FAIL] {}\n", test.name);
             
         for(const auto& message: testResult.messages)
         {
