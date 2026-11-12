@@ -72,9 +72,23 @@
             ]
         },
         {
+            "label": "Build Debug AnimeTower_TileTemplateGenerator",
+            "type": "shell",
+            "command": "cmake --preset debug ; cmake --build --preset debug --target AnimeTower_TileTemplateGenerator",
+            "group": {
+                "kind": "build",
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
             "label": "Build default - debug all",
             "type": "shell",
-            "command": "cmake --preset debug ; cmake --build --preset debug --target AnimeTower_Tests ; cmake --build --preset debug --target AnimeTower",
+            "command": "cmake --preset debug ; cmake --build --preset debug --target AnimeTower_Tests ; cmake --build --preset debug --target AnimeTower ; cmake --build --preset debug --target AnimeTower_TileTemplateGenerator",
             "group": {
                 "kind": "build",
                 "isDefault": true

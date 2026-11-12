@@ -7,21 +7,26 @@
 #include "atPlatformBuilder.h"
 #include "atTextureLoader.h"
 #include "atPlatformRenderAtlasLoader.h"
+#include "atObjectRender.h"
+#include "atObjectAtlasLoader.h"
 #include "atDefaults.h"
 
 struct atTextures
 {
     atPlatformRender::Atlas platformAtlas;
+    atObjectRender::Atlas flagPolAtlas;
     Texture2D playerTexture;
     void load(atTextureLoader &textureLoader)
     {
         platformAtlas = atPlatformRenderAtlasLoader::load_1_3(textureLoader.loadTextureFromFile("./resource/tile_1_3_64.png"));
+        flagPolAtlas = atObjectAtlasLoader::loadGrid(textureLoader.loadTextureFromFile("./resource/flagPoll_2_2_64_128.png"), 2, 2);
         playerTexture = textureLoader.loadTextureFromFile("./resource/elBuba.png");
     }
     void unload()
     {
         UnloadTexture(playerTexture);
         UnloadTexture(platformAtlas.texture);
+        UnloadTexture(flagPolAtlas.texture);
     }
 };
 
@@ -36,8 +41,7 @@ int main()
         platformBuilder.buildHorizontalLeft({0.f, 2.7f}, 10.f),
         platformBuilder.buildHorizontalRight({5.f, 2.7f}, 10.f),
         platformBuilder.buildHorizontalRight({7.f, 5.4f}, 3.f),
-        platformBuilder.buildHorizontalRight({-2.f, 1.5f}, 20.f)
-    };
+        platformBuilder.buildHorizontalRight({-2.f, 1.5f}, 20.f)};
     static const int horizontalPlatformQty = sizeof(horizontalPlatforms_lwp) / sizeof(horizontalPlatforms_lwp[0]);
     Rectangle horizontalPlatforms_raylib[horizontalPlatformQty];
     for (int i = 0; i < horizontalPlatformQty; i++)
@@ -47,6 +51,9 @@ int main()
     const lwp::Vector2f playerDefaultPos{1.1f, 2.f};
     player.box = lwp::Rectangle::build_BottomCenter(playerDefaultPos, {atDefaults::playerW_lwp, atDefaults::playerH_lwp});
     bool isPlayerCurrentFaceRight = true;
+
+    lwp::Rectangle rectFlag_lwp = lwp::Rectangle::build_BottomRight({0.f, 2.7f}, {1.f, 2.f});
+    Rectangle rectFlag_raylib = Renderer_lwpToRaylib::lwpToRaylib_rectangle(rectFlag_lwp);
 
     InitWindow(atDefaults::screenWidth, atDefaults::screenHeight, "AnimeTower");
     SetTargetFPS(120);
@@ -77,6 +84,8 @@ int main()
         atPlatformRender::drawSpan(textures.platformAtlas, horizontalPlatforms_raylib);
         // Renderer_lwpToRaylib::drawRectangles({&player.box, 1}, PINK);
         Renderer_lwpToRaylib::drawTexture_sameHigh(player.box, textures.playerTexture, isPlayerCurrentFaceRight);
+
+        atObjectRender::drawAnimated(textures.flagPolAtlas, (float)GetTime(), 0.15f, rectFlag_raylib);
         EndMode2D();
 
         hud.draw(input);

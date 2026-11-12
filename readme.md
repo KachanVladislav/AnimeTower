@@ -48,20 +48,27 @@ git clone --recurse-submodules <repo-url>
 * release: `AnimeTower`, `AnimeTower_Tests`
 * dist: `AnimeTower`
 
+# Tile templates
+
+`generateTileTemplates.bat` builds and runs `AnimeTower_TileTemplateGenerator` — generates tile grid PNGs into `./tileTemplates/`
+
 
 # Project structure
 ```
 ./
 ├── 3rdParty/raylib         # raylib (git submodule)
 ├── src/
-│   ├── main.cpp            # AnimeTower main()
-│   ├── main_Tests.cpp      # Tests main()
+│   ├── main.cpp                      # AnimeTower main()
+│   ├── main_Tests.cpp                # Tests main()
+│   ├── main_TileTemplateGenerator.cpp # Tile grid generator main()
 │   ├── CMakeLists.txt
 │   └── CMakePresets.json
 ├── resource/               # resources
 ├── build/                  # build output (gitignored)
-├── dist.bat                # see "Distribution" section
+├── dist.bat                    # see "Distribution" section
+├── generateTileTemplates.bat   # build & run TileTemplateGenerator
 ├── distribution/           # release output (gitignored)
+├── tileTemplates/          # generated tile grids (gitignored)
 └── .vscode/                # comfy vscode tasks, settings, launch config (run tests, game)
 ```
 
@@ -84,6 +91,7 @@ presets
 targets
 * **AnimeTower**
 * **AnimeTower_Tests**
+* **AnimeTower_TileTemplateGenerator** — utility, generates tile grid templates
 
 build example:
 ```bash

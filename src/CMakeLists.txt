@@ -65,3 +65,8 @@ if(BUILD_TESTS_NO_CONSOLE)
 else()
     add_game_executable(${PROJECT_NAME}_Tests ${TEST_SOURCES})
 endif()
+
+# =============================================================================
+# Tile Template Generator executable
+# =============================================================================
+add_game_executable(${PROJECT_NAME}_TileTemplateGenerator main_TileTemplateGenerator.cpp)

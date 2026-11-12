@@ -33,3 +33,4 @@ Thumbs.db
 # Include .vscode (tracked separately)
 !.vscode/
 notes/
+tileTemplates/

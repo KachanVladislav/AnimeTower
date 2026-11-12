@@ -40,7 +40,7 @@ namespace lwp
         {
             Rectangle res;
             res.x = pos.x;
-            res.y = pos.y;
+            res.y = pos.y - size.y;
             res.width = size.x;
             res.height = size.y;
             return res;
@@ -50,6 +50,15 @@ namespace lwp
             Rectangle res;
             res.x = posBottomCenter.x - size.x / 2;
             res.y = posBottomCenter.y;
+            res.width = size.x;
+            res.height = size.y;
+            return res;
+        }
+        static Rectangle build_BottomRight(Vector2f posBottomRight, Vector2f size)
+        {
+            Rectangle res;
+            res.x = posBottomRight.x - size.x;
+            res.y = posBottomRight.y;
             res.width = size.x;
             res.height = size.y;
             return res;

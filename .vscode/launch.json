@@ -66,5 +66,18 @@
             "saveAllBeforeStart": true,
             "preLaunchTask": "Build Release AnimeTower_Tests"
         },
+        {
+            "name": "AnimeTower_TileTemplateGenerator Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/Debug/AnimeTower_TileTemplateGenerator.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "externalTerminal",
+            "saveAllBeforeStart": true,
+            "preLaunchTask": "Build Debug AnimeTower_TileTemplateGenerator"
+        }
     ]
 }
