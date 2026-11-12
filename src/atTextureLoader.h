@@ -3,26 +3,14 @@
 
 class atTextureLoader
 {
-    Image placeHolderImage;
-    Texture2D placeholderTexture;
 public:
-    void load()
-    {
-        placeHolderImage = GenImageColor(8, 8, RED);
-        placeholderTexture = loadTextureFromImage(placeHolderImage, "placeholderTexture");
-    }
-    void unload()
-    {
-        UnloadImage(placeHolderImage);
-        UnloadTexture(placeholderTexture);
-    }
     Image loadImageFromFile(const char *fileName)
     {
         Image image = LoadImage(fileName);
         if (!IsImageValid(image))
         {
             TraceLog(LOG_ERROR, "Failed to load image: %s", fileName);
-            return placeHolderImage;
+            return GenImageColor(8, 8, RED);
         }
         TraceLog(LOG_INFO, "Image loaded: %dx%d, format=%d", image.width, image.height, image.format);
         return image;
@@ -31,10 +19,7 @@ public:
     {
         Texture2D texture = LoadTextureFromImage(image);
         if (!IsTextureValid(texture))
-        {
             TraceLog(LOG_ERROR, "Failed to create texture from image, %s", errorText);
-            return placeholderTexture;
-        }
         return texture;
     }
     Texture2D loadTextureFromFile(const char *fileName)

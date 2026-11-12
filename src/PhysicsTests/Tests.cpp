@@ -9,7 +9,7 @@ PHYSICS_TEST(collisionLeft)
     PhysicsTest_PhysicsData &physicsData = result.physicsData;
     physicsData.fps = 120;
 
-    atPlatformBuilder platformBuilder;
+    atPlatformBuilder platformBuilder(0.5f);
     physicsData.staticPlatforms = {
         platformBuilder.buildHorizontalRight({-3.f, 0.0f}, 6.f),
         platformBuilder.buildHorizontalLeft({-1.f, 1.4f}, 2.f),
@@ -42,7 +42,7 @@ PHYSICS_TEST(fallOnFloor)
     PhysicsTest_PhysicsData &physicsData = result.physicsData;
     physicsData.fps = 120;
 
-    atPlatformBuilder platformBuilder;
+    atPlatformBuilder platformBuilder(0.5f);
     physicsData.staticPlatforms = {
         platformBuilder.buildHorizontalRight({0.f, 0.0f}, 2.f),
     };
@@ -73,7 +73,7 @@ PHYSICS_TEST(jumpTricky)
     PhysicsTest_PhysicsData &physicsData = result.physicsData;
     physicsData.fps = 120;
 
-    atPlatformBuilder platformBuilder;
+    atPlatformBuilder platformBuilder(0.5f);
     physicsData.staticPlatforms = {
         platformBuilder.buildHorizontalRight({-5.f, 0.0f}, 10.f),
         platformBuilder.buildHorizontalRight({-0.2f, 2.1f}, 3.2f),
