@@ -11,42 +11,47 @@ namespace lwp
 
     struct Rectangle
     {
-        Vector2f bottomLeftPos{}; // bottom-left corner (physics)
-        Vector2f size{};          // width, height
-        Vector2f getPos_TopLeft() const { return {bottomLeftPos.x, bottomLeftPos.y + size.y}; }
-        float getY_Bottom() const { return bottomLeftPos.y; }
-        float getY_Top() const { return bottomLeftPos.y + size.y; }
-        float getX_Right() const { return bottomLeftPos.x + size.x; }
-        float getX_Left() const { return bottomLeftPos.x; }
-        void setY_Bottom(float val)  { bottomLeftPos.y = val; }
-        void setY_Top(float val)  { bottomLeftPos.y = val - size.y; }
-        void setX_Right(float val)  { bottomLeftPos.x = val - size.x; }
-        void setX_Left(float val)  { bottomLeftPos.x = val; }
+        float x{};      // bottom-left X
+        float y{};      // bottom-left Y
+        float width{};
+        float height{};
+        Vector2f getPos_TopLeft() const { return {x, y + height}; }
+        float getY_Bottom() const { return y; }
+        float getY_Top() const { return y + height; }
+        float getX_Right() const { return x + width; }
+        float getX_Left() const { return x; }
+        void setY_Bottom(float val)  { y = val; }
+        void setY_Top(float val)  { y = val - height; }
+        void setX_Right(float val)  { x = val - width; }
+        void setX_Left(float val)  { x = val; }
         Vector2f getCenter() const
         {
             return Vector2f{
-                bottomLeftPos.x + size.x / 2.f,
-                bottomLeftPos.y + size.y / 2.f,
+                x + width / 2.f,
+                y + height / 2.f,
             };
         }
         void move(const Vector2f &delta)
         {
-            bottomLeftPos.x += delta.x;
-            bottomLeftPos.y += delta.y;
+            x += delta.x;
+            y += delta.y;
         }
         static Rectangle build_UpLeft(Vector2f pos, Vector2f size)
         {
             Rectangle res;
-            res.bottomLeftPos = Vector2f{pos.x, pos.y - size.y};
-            res.size = size;
+            res.x = pos.x;
+            res.y = pos.y;
+            res.width = size.x;
+            res.height = size.y;
             return res;
         }
         static Rectangle build_BottomCenter(Vector2f posBottomCenter, Vector2f size)
         {
             Rectangle res;
-            res.bottomLeftPos.x = posBottomCenter.x - size.x / 2;
-            res.bottomLeftPos.y = posBottomCenter.y;
-            res.size = size;
+            res.x = posBottomCenter.x - size.x / 2;
+            res.y = posBottomCenter.y;
+            res.width = size.x;
+            res.height = size.y;
             return res;
         }
     };
