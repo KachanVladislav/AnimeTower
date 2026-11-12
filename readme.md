@@ -3,6 +3,8 @@
 AnimeTower game on raylib with custom physics.
 C++23 for fancy stuff.
 
+![AnimeTower screenshot](screenshot.png)
+
 ## notes section
 
 * at - prefix, as AnimeTower (ex. atPhysics.h)
