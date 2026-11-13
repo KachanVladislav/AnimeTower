@@ -6,7 +6,7 @@ AnimeTower game with raylib.
 
 # Get source
 ```bash
-# --recurse-submodules for raylib
+# --recurse-submodules for raylib and raygui
 git clone --recurse-submodules <repo-url>
 ```
 # Requirements
@@ -43,7 +43,9 @@ git clone --recurse-submodules <repo-url>
 # Project structure
 ```
 ./
-├── 3rdParty/raylib         # raylib (git submodule)
+├── 3rdParty/
+│   ├── raylib/               # raylib (git submodule)
+│   └── raygui/               # raygui (git submodule)
 ├── src/
 │   ├── main.cpp                      # atGame main()
 │   ├── main_Tests.cpp                # atTests main()
@@ -95,4 +97,6 @@ cd ..
 
 MIT © KachanVladislav — see [LICENSE](LICENSE)
 
-Uses [raylib](https://github.com/raysan5/raylib) (zlib/libpng license)
+Uses:
+- [raylib](https://github.com/raysan5/raylib) (zlib/libpng license)
+- [raygui](https://github.com/raysan5/raygui) (zlib/libpng license)

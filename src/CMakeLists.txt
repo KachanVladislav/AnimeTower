@@ -74,4 +74,9 @@ add_game_executable(atTileTemplateGenerator main_TileTemplateGenerator.cpp)
 # =============================================================================
 # Level Designer executable
 # =============================================================================
-add_game_executable(atLevelDesigner main_LevelDesigner.cpp)
+set(LEVEL_DESIGNER_SOURCES
+    main_LevelDesigner.cpp
+    atRaygui.cpp
+)
+add_game_executable(atLevelDesigner ${LEVEL_DESIGNER_SOURCES})
+target_include_directories(atLevelDesigner PRIVATE ../3rdParty/raygui/src)

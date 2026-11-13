@@ -9,12 +9,16 @@
 #include "atResource/atResourceRender.h"
 #include "atRender/atRenderLevel.h"
 #include "atDefaults.h"
+#include "raygui.h"
+
+const char* LEVEL_PATH = "./resource/levels/defaultLevel.txt";
+const char* LEVEL_PATH_TO_SAVE = "./resource/levels/levelFromDesigner.txt";
 
 int main()
 {
     SetTraceLogLevel(LOG_WARNING); // raylib  logs
 
-    atLevelData levelData = atLevelDataLoader::loadLevelSourceData("./resource/levels/defaultLevel.txt");
+    atLevelData levelData = atLevelDataLoader::loadLevelSourceData(LEVEL_PATH);
     lwp::RigidBody2D player;
     player.rect = lwp::Rectangle::build_BottomCenter(levelData.playerPos, {atDefaults::playerW_lwp, atDefaults::playerH_lwp});
 
@@ -50,8 +54,12 @@ int main()
         camera.setTarget_lwp(player.rect.getCenter());
         BeginMode2D(camera.camera);
         atRenderLevel::render(renderData, textures);
-
         EndMode2D();
+
+        if (GuiButton({atDefaults::screenWidth - 80 - 10, 10, 80, 30}, "Save"))
+        {
+            atLevelDataLoader::saveLevelSourceData(LEVEL_PATH_TO_SAVE, levelData);
+        }
 
         hud.draw(input);
         EndDrawing();
