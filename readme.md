@@ -10,13 +10,11 @@ AnimeTower game with raylib.
 git clone --recurse-submodules <repo-url>
 ```
 # Requirements
-
 - CMake
 - Visual Studio 2022+ (MSVC)
 - for comfy vscode: `ms-vscode.cpptools-extension-pack`
 
 # Distribution (easy way to build and run)
-
 * run `dist.bat`
 * it creates:
 ```
@@ -36,16 +34,11 @@ git clone --recurse-submodules <repo-url>
     ```
 
 # Miscellaneous scripts
-
-<dl>
-<dt><code>run_all.bat</code></dt>
-<dd>sequantially <code>build</code> and <code>executes</code>:</dd>
-<dd> - debug: <code>atGame</code>, <code>atTests</code>, <code>atTileTemplateGenerator</code></dd>
-<dd> - release: <code>atGame</code>, <code>atTests</code></dd>
-<dd> - dist: <code>atGame</code></dd>
-<dt><code>gen_tileTemplates.bat</code></dt>
-<dd>builds and runs <code>atTileTemplateGenerator</code> — generates tile grid PNGs into <code>./tileTemplates/</code></dd>
-</dl>
+- **`run_all.bat`** — sequantially `build` and `executes`:
+  - debug: `atGame`, `atTests`, `atTileTemplateGenerator`
+  - release: `atGame`, `atTests`
+  - dist: `atGame`
+- **`gen_tileTemplates.bat`** — builds and runs `atTileTemplateGenerator` — generates tile grid PNGs into `./tileTemplates/`
 
 # Project structure
 ```
@@ -72,26 +65,20 @@ git clone --recurse-submodules <repo-url>
 > [!NOTE]
 > `CMakeLists.txt` in `src/`, so all scripts should address it
 
-<dl>
-<dt><b>Source of truth</b></dt>
-<dd> <code>.vscode/tasks.json</code> - how to build (commands right there)</dd>
-<dd> <code>dist.bat</code> - how to build dist via .bat</dd>
-<dd> <code>.vscode/launch.json</code> - where .exe lives</dd>
-</dl>
+- **Source of truth:**
+  - `.vscode/tasks.json` — how to build (commands right there)
+  - `dist.bat` — how to build dist via .bat
+  - `.vscode/launch.json` — where .exe lives
 
-<dl>
-<dt><b>Cmake presets</b></dt>
-<dd> <code>debug</code></dd>
-<dd> <code>release</code></dd>
-<dd> <code>dist</code> - same as release, except without console window</dd>
-</dl>
+- **Cmake presets:**
+  - `debug`
+  - `release`
+  - `dist` — same as release, except without console window
 
-<dl>
-<dt><b>Targets</b></dt>
-<dd> <code>atGame</code></dd>
-<dd> <code>atTests</code></dd>
-<dd> <code>atTileTemplateGenerator</code> - utility, generates tile grid templates</dd>
-</dl>
+- **Targets:**
+  - `atGame`
+  - `atTests`
+  - `atTileTemplateGenerator` — utility, generates tile grid templates
 
 **Build example:**
 ```bash
