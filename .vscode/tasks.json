@@ -86,9 +86,23 @@
             ]
         },
         {
+            "label": "Build Debug atLevelDesigner",
+            "type": "shell",
+            "command": "cmake --preset debug ; cmake --build --preset debug --target atLevelDesigner",
+            "group": {
+                "kind": "build"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
             "label": "Build default - debug all",
             "type": "shell",
-            "command": "cmake --preset debug ; cmake --build --preset debug --target atTests ; cmake --build --preset debug --target atGame ; cmake --build --preset debug --target atTileTemplateGenerator",
+            "command": "cmake --preset debug ; cmake --build --preset debug --target atTests ; cmake --build --preset debug --target atGame ; cmake --build --preset debug --target atTileTemplateGenerator ; cmake --build --preset debug --target atLevelDesigner",
             "group": {
                 "kind": "build",
                 "isDefault": true

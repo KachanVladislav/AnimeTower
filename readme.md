@@ -35,7 +35,7 @@ git clone --recurse-submodules <repo-url>
 
 # Miscellaneous scripts
 - **`run_all.bat`** — sequantially `build` and `executes`:
-  - debug: `atGame`, `atTests`, `atTileTemplateGenerator`
+  - debug: `atGame`, `atTests`, `atTileTemplateGenerator`, `atLevelDesigner`
   - release: `atGame`, `atTests`
   - dist: `atGame`
 - **`gen_tileTemplates.bat`** — builds and runs `atTileTemplateGenerator` — generates tile grid PNGs into `./tileTemplates/`
@@ -48,6 +48,7 @@ git clone --recurse-submodules <repo-url>
 │   ├── main.cpp                      # atGame main()
 │   ├── main_Tests.cpp                # atTests main()
 │   ├── main_TileTemplateGenerator.cpp # atTileTemplateGenerator main()
+│   ├── main_LevelDesigner.cpp        # atLevelDesigner main()
 │   ├── CMakeLists.txt
 │   └── CMakePresets.json
 ├── resource/               # resources
@@ -79,6 +80,7 @@ git clone --recurse-submodules <repo-url>
   - `atGame`
   - `atTests`
   - `atTileTemplateGenerator` — utility, generates tile grid templates
+  - `atLevelDesigner`
 
 **Build example:**
 ```bash

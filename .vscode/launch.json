@@ -78,6 +78,19 @@
             "console": "externalTerminal",
             "saveAllBeforeStart": true,
             "preLaunchTask": "Build Debug atTileTemplateGenerator"
+        },
+        {
+            "name": "atLevelDesigner Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/Debug/atLevelDesigner.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "externalTerminal",
+            "saveAllBeforeStart": true,
+            "preLaunchTask": "Build Debug atLevelDesigner"
         }
     ]
 }

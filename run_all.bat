@@ -4,12 +4,12 @@ setlocal enabledelayedexpansion
 REM ============================================================================
 REM Array of {preset, target} pairs
 REM ============================================================================
-set CONFIGS=debug:atTests release:atTests debug:atGame release:atGame dist:atGame debug:atTileTemplateGenerator
+set CONFIGS=debug:atTests release:atTests debug:atGame release:atGame dist:atGame debug:atTileTemplateGenerator debug:atLevelDesigner
 
 REM ============================================================================
 REM Counter for progress display
 REM ============================================================================
-set TOTAL=6
+set TOTAL=7
 set CURRENT=0
 
 echo ===================================================

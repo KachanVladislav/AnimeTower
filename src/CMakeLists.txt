@@ -70,3 +70,8 @@ endif()
 # Tile Template Generator executable
 # =============================================================================
 add_game_executable(atTileTemplateGenerator main_TileTemplateGenerator.cpp)
+
+# =============================================================================
+# Level Designer executable
+# =============================================================================
+add_game_executable(atLevelDesigner main_LevelDesigner.cpp)
