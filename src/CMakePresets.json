@@ -11,7 +11,7 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "description": "/W4 only for C++; C uses default(for raylib - to many warnings)",
                 "CMAKE_C_FLAGS": "/Zi /Od",
-                "CMAKE_CXX_FLAGS": "/W4 /Zi /Od"
+                "CMAKE_CXX_FLAGS": "/W4 /Zi /Od /EHsc"
             }
         },
         {
@@ -23,7 +23,7 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_C_FLAGS": "/O2",
-                "CMAKE_CXX_FLAGS": "/W4 /O2"
+                "CMAKE_CXX_FLAGS": "/W4 /O2 /EHsc"
             }
         },
         {
@@ -36,7 +36,7 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "BUILD_NO_CONSOLE": "ON",
                 "CMAKE_C_FLAGS": "/O2",
-                "CMAKE_CXX_FLAGS": "/W4 /O2"
+                "CMAKE_CXX_FLAGS": "/W4 /O2 /EHsc"
             }
         }
     ],

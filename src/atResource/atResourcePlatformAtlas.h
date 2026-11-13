@@ -1,13 +1,22 @@
 #pragma once
-#include "atPlatformRender.h"
+#include "raylib.h"
 
-struct atPlatformRenderAtlasLoader
+struct atResourcePlatformAtlas
+{
+    Texture2D texture;
+    Rectangle recLeft;
+    Rectangle recMid;
+    Rectangle recRight;
+    float offset_y = 0;
+};
+
+struct atResourcePlatformAtlasLoader
 {
     // default one for now
     // 1 row, 3 columns, size {3*h, h}
-    static atPlatformRender::Atlas load_1_3(const Texture2D &texture)
+    static atResourcePlatformAtlas load_1_3(const Texture2D &texture)
     {
-        atPlatformRender::Atlas res;
+        atResourcePlatformAtlas res;
         res.texture = texture;
 
         const float h = (float)texture.height;

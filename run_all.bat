@@ -4,12 +4,12 @@ setlocal enabledelayedexpansion
 REM ============================================================================
 REM Array of {preset, target} pairs
 REM ============================================================================
-set CONFIGS=debug:AnimeTower_Tests release:AnimeTower_Tests debug:AnimeTower release:AnimeTower dist:AnimeTower
+set CONFIGS=debug:AnimeTower_Tests release:AnimeTower_Tests debug:AnimeTower release:AnimeTower dist:AnimeTower debug:AnimeTower_TileTemplateGenerator
 
 REM ============================================================================
 REM Counter for progress display
 REM ============================================================================
-set TOTAL=5
+set TOTAL=6
 set CURRENT=0
 
 echo ===================================================

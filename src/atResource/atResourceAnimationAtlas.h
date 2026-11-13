@@ -1,11 +1,18 @@
 #pragma once
-#include "atObjectRender.h"
+#include "raylib.h"
 
-struct atObjectAtlasLoader
+struct atResourceAnimationAtlas
 {
-    static atObjectRender::Atlas loadGrid(const Texture2D &texture, int rows, int cols)
+    Texture2D texture;
+    Rectangle frames[32];
+    int frameQty = 0;
+};
+
+struct atResourceAnimationAtlasLoader
+{
+    static atResourceAnimationAtlas loadGrid(const Texture2D &texture, int rows, int cols)
     {
-        atObjectRender::Atlas res;
+        atResourceAnimationAtlas res;
         res.texture = texture;
         res.frameQty = rows * cols;
 

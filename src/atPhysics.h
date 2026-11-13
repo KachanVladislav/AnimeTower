@@ -35,38 +35,38 @@ struct atPhysics
     /// @brief apply gravity, resolve collisions
     static void updatePhysics(lwp::RigidBody2D &player, std::span<lwp::Rectangle> staticObjects, float dT)
     {
-        float playerBottomBefore = player.box.getY_Bottom();
+        float playerBottomBefore = player.rect.getY_Bottom();
 
         player.speed.y = player.speed.y - g * dT;
         player.applySpeedToBoxPos(dT);
         player.onFloor = false;
 
-        float playerBottom = player.box.getY_Bottom();
+        float playerBottom = player.rect.getY_Bottom();
         for (const auto box : staticObjects)
         {
             // floor collision
             if (playerBottomBefore >= box.getY_Top() && playerBottom <= box.getY_Top()) // y-level
             {
-                bool notAligned_x = player.box.getX_Right() < box.getX_Left() || player.box.getX_Left() > box.getX_Right();
+                bool notAligned_x = player.rect.getX_Right() < box.getX_Left() || player.rect.getX_Left() > box.getX_Right();
                 if (!notAligned_x) // x-level
                     player.setOnFloor(box.getY_Top());
             }
 
             // same y-level
-            if (player.box.getY_Bottom() < box.getY_Top() && player.box.getY_Top() > box.getY_Top())
+            if (player.rect.getY_Bottom() < box.getY_Top() && player.rect.getY_Top() > box.getY_Top())
             {
                 // right collision
-                if (player.box.getX_Right() > box.getX_Left() && player.box.getX_Left() < box.getX_Left())
+                if (player.rect.getX_Right() > box.getX_Left() && player.rect.getX_Left() < box.getX_Left())
                 {
                     if(player.speed.x > 0)
-                        player.box.setX_Right(box.getX_Left());
+                        player.rect.setX_Right(box.getX_Left());
                 }
 
                 // left collision
-                if (player.box.getX_Left() < box.getX_Right() && player.box.getX_Right() > box.getX_Right())
+                if (player.rect.getX_Left() < box.getX_Right() && player.rect.getX_Right() > box.getX_Right())
                 {
                     if(player.speed.x < 0)
-                        player.box.setX_Left(box.getX_Right());
+                        player.rect.setX_Left(box.getX_Right());
                 }
             }
         }

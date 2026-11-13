@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer_lwpToRaylib.h"
+#include "atConvert_lwpToRaylib.h"
 
 struct atCamera
 {
@@ -14,6 +14,6 @@ struct atCamera
     }
     void setTarget_lwp(const lwp::Vector2f pos)
     {
-        camera.target = Renderer_lwpToRaylib::lwpToRaylib_position(pos);
+        camera.target = atConvert_lwpToRaylib::position(pos);
     }
 };

@@ -2,7 +2,8 @@
 #include "PhysicsTest_Visualizer.h"
 #include "../hud/hud.h"
 #include "../atCamera.h"
-#include "../Renderer_lwpToRaylib.h"
+#include "../atConvert_lwpToRaylib.h"
+#include "../atRender/atRenderBasic.h"
 
 class PhysicsTest_Visualizer
 {
@@ -33,19 +34,22 @@ public:
         const float dT = 1 / (float)data.fps;
         const float maxTime = maxIndex * dT;
 
+        std::vector<Rectangle> platformRectangles = atConvert_lwpToRaylib::buildRectsVector(data.staticPlatforms);
+
         while (!WindowShouldClose())
         {
             InputSystemResult input = data.inputs[currentIndex];
             const lwp::RigidBody2D &player = data.playerOverFrames[currentIndex];
-
-            camera.setTarget_lwp(player.box.getCenter());
+            Rectangle playerRect = atConvert_lwpToRaylib::rectangle(player.rect);
+            camera.setTarget_lwp(player.rect.getCenter());
 
             BeginDrawing();
 
             BeginMode2D(camera.camera);
             ClearBackground(RAYWHITE);
-            Renderer_lwpToRaylib::drawRectangles(data.staticPlatforms, GREEN);
-            Renderer_lwpToRaylib::drawRectangles({&player.box, 1}, PINK);
+
+            atRenderBasic::drawRectangles(platformRectangles, GREEN);
+            atRenderBasic::drawRectangles({&playerRect, 1}, PINK);
             EndMode2D();
 
             hud.draw(input);

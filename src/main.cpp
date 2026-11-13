@@ -1,67 +1,46 @@
 #include "InputSystem.h"
 #include "Console.h"
-#include "atPhysics.h"
 #include "atCamera.h"
 #include "hud/hud.h"
-#include "Renderer_lwpToRaylib.h"
-#include "atPlatformBuilder.h"
-#include "atTextureLoader.h"
-#include "atPlatformRenderAtlasLoader.h"
-#include "atObjectRender.h"
-#include "atObjectAtlasLoader.h"
-#include "atDefaults.h"
 
-struct atTextures
-{
-    atPlatformRender::Atlas platformAtlas;
-    atObjectRender::Atlas flagPolAtlas;
-    Texture2D playerTexture;
-    void load(atTextureLoader &textureLoader)
-    {
-        platformAtlas = atPlatformRenderAtlasLoader::load_1_3(textureLoader.loadTextureFromFile("./resource/tile_1_3_64.png"));
-        flagPolAtlas = atObjectAtlasLoader::loadGrid(textureLoader.loadTextureFromFile("./resource/flagPoll_2_2_64_128.png"), 2, 2);
-        playerTexture = textureLoader.loadTextureFromFile("./resource/elBuba.png");
-    }
-    void unload()
-    {
-        UnloadTexture(playerTexture);
-        UnloadTexture(platformAtlas.texture);
-        UnloadTexture(flagPolAtlas.texture);
-    }
-};
+#include "atLevel/atLevelData.h"
+#include "atPhysics.h"
+#include "atConvert_lwpToRaylib.h"
+#include "atResource/atResourceRender.h"
+#include "atRender/atRenderLevel.h"
+#include "atDefaults.h"
 
 int main()
 {
     SetTraceLogLevel(LOG_WARNING); // raylib  logs
 
-    atPlatformBuilder platformBuilder(atDefaults::platformHeight_lwp);
-    lwp::Rectangle horizontalPlatforms_lwp[] = {
-        // lwp::Rectangle::build_BottomCenter({100.f, 300.f}, {50.f, 100.f}),
-        // lwp::Rectangle::build_BottomCenter({500.f, 300.f}, {50.f, 100.f}),
-        platformBuilder.buildHorizontalLeft({0.f, 2.7f}, 10.f),
-        platformBuilder.buildHorizontalRight({5.f, 2.7f}, 10.f),
-        platformBuilder.buildHorizontalRight({7.f, 5.4f}, 3.f),
-        platformBuilder.buildHorizontalRight({-2.f, 1.5f}, 20.f)};
-    static const int horizontalPlatformQty = sizeof(horizontalPlatforms_lwp) / sizeof(horizontalPlatforms_lwp[0]);
-    Rectangle horizontalPlatforms_raylib[horizontalPlatformQty];
-    for (int i = 0; i < horizontalPlatformQty; i++)
-        horizontalPlatforms_raylib[i] = Renderer_lwpToRaylib::lwpToRaylib_rectangle(horizontalPlatforms_lwp[i]);
-
+    // atPlatformBuilder platformBuilder(atDefaults::platformHeight_lwp);
+    // atLevelData levelData;
+    // levelData.horizontalPlatforms_lwp = std::vector<lwp::Rectangle>{
+    //     platformBuilder.buildHorizontalLeft({0.f, 2.7f}, 10.f),
+    //     platformBuilder.buildHorizontalRight({5.f, 2.7f}, 10.f),
+    //     platformBuilder.buildHorizontalRight({7.f, 5.4f}, 3.f),
+    //     platformBuilder.buildHorizontalRight({-2.f, 1.5f}, 20.f)};
+    // levelData.objectsRects_lwp = std::vector<lwp::Rectangle>{
+    //     lwp::Rectangle::build_BottomRight({0.f, 2.7f}, {1.f, 2.f}),
+    // };
+    // levelData.playerPos = lwp::Vector2f{1.1f, 2.f};
+    // atLevelDataLoader::saveLevelSourceData("./resource/levels/defaultLevel.txt",levelData);
+    atLevelData levelData = atLevelDataLoader::loadLevelSourceData("./resource/levels/defaultLevel.txt");
     lwp::RigidBody2D player;
-    const lwp::Vector2f playerDefaultPos{1.1f, 2.f};
-    player.box = lwp::Rectangle::build_BottomCenter(playerDefaultPos, {atDefaults::playerW_lwp, atDefaults::playerH_lwp});
-    bool isPlayerCurrentFaceRight = true;
+    player.rect = lwp::Rectangle::build_BottomCenter(levelData.playerPos, {atDefaults::playerW_lwp, atDefaults::playerH_lwp});
 
-    lwp::Rectangle rectFlag_lwp = lwp::Rectangle::build_BottomRight({0.f, 2.7f}, {1.f, 2.f});
-    Rectangle rectFlag_raylib = Renderer_lwpToRaylib::lwpToRaylib_rectangle(rectFlag_lwp);
+    atRenderLevelData renderData;
+    renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(levelData.horizontalPlatforms_lwp);
+    renderData.objectsRects_raylib = atConvert_lwpToRaylib::buildRectsVector(levelData.objectsRects_lwp);
+    renderData.playerRect = atConvert_lwpToRaylib::rectangle(player.rect);
 
     InitWindow(atDefaults::screenWidth, atDefaults::screenHeight, "AnimeTower");
     SetTargetFPS(120);
 
     InputSystem inputSystem;
-    atTextureLoader textureLoader;
-    atTextures textures;
-    textures.load(textureLoader);
+    atResourceRender textures;
+    textures.load();
     atCamera camera;
     camera.initialize(atDefaults::screenWidth, atDefaults::screenHeight, atDefaults::screenWidth_lwp);
     HUD hud;
@@ -71,21 +50,19 @@ int main()
     {
         float dT = GetFrameTime(); // if less than cap than cap?
         InputSystemResult input = inputSystem.update();
-        if (input.direction)
-            isPlayerCurrentFaceRight = (*input.direction == InputSystemDirection::right);
         atPhysics::applyInputToRigidBody(player, input);
-        atPhysics::updatePhysics(player, horizontalPlatforms_lwp, dT);
+        atPhysics::updatePhysics(player, levelData.horizontalPlatforms_lwp, dT);
+
+        renderData.playerRect = atConvert_lwpToRaylib::rectangle(player.rect);
+        if (input.direction)
+            renderData.isPlayerFaceRight = (*input.direction == InputSystemDirection::right);
 
         BeginDrawing();
 
-        camera.setTarget_lwp(player.box.getCenter());
+        camera.setTarget_lwp(player.rect.getCenter());
         BeginMode2D(camera.camera);
-        ClearBackground(LIGHTGRAY);
-        atPlatformRender::drawSpan(textures.platformAtlas, horizontalPlatforms_raylib);
-        // Renderer_lwpToRaylib::drawRectangles({&player.box, 1}, PINK);
-        Renderer_lwpToRaylib::drawTexture_sameHigh(player.box, textures.playerTexture, isPlayerCurrentFaceRight);
+        atRenderLevel::render(renderData, textures);
 
-        atObjectRender::drawAnimated(textures.flagPolAtlas, (float)GetTime(), 0.15f, rectFlag_raylib);
         EndMode2D();
 
         hud.draw(input);

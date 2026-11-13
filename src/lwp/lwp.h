@@ -67,16 +67,16 @@ namespace lwp
 
     struct RigidBody2D
     {
-        Rectangle box{};
+        Rectangle rect{};
         Vector2f speed{};
         bool onFloor = false;
         void applySpeedToBoxPos(float dT)
         {
-            box.move({speed.x * dT, speed.y * dT});
+            rect.move({speed.x * dT, speed.y * dT});
         }
         void setOnFloor(float floorY)
         {
-            box.setY_Bottom(floorY);
+            rect.setY_Bottom(floorY);
             speed.y = 0;
             onFloor = true;
         }

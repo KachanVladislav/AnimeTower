@@ -16,7 +16,7 @@ PHYSICS_TEST(collisionLeft)
     };
 
     lwp::RigidBody2D player;
-    player.box = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
+    player.rect = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
 
     float dT = 1 / (float)physicsData.fps;
     InputSystemResult input;
@@ -30,7 +30,7 @@ PHYSICS_TEST(collisionLeft)
         physicsData.playerOverFrames.push_back(player);
     }
 
-    bool isPlayerCollided = player.box.getCenter().x > -1.f;
+    bool isPlayerCollided = player.rect.getCenter().x > -1.f;
     result.assert(isPlayerCollided, "Player went through collision");
 
     return result;
@@ -48,7 +48,7 @@ PHYSICS_TEST(fallOnFloor)
     };
 
     lwp::RigidBody2D player;
-    player.box = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
+    player.rect = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
 
     float dT = 1 / (float)physicsData.fps;
     for (float time = 0; time < 1; time += dT)
@@ -61,7 +61,7 @@ PHYSICS_TEST(fallOnFloor)
         physicsData.playerOverFrames.push_back(player);
     }
 
-    bool isPlayerAboveFloor = player.box.getCenter().y > 0;
+    bool isPlayerAboveFloor = player.rect.getCenter().y > 0;
     result.assert(isPlayerAboveFloor, "Player fell under the floor");
 
     return result;
@@ -79,7 +79,7 @@ PHYSICS_TEST(jumpTricky)
         platformBuilder.buildHorizontalRight({-0.2f, 2.1f}, 3.2f),
     };
     lwp::RigidBody2D player;
-    player.box = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
+    player.rect = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
 
     auto getInput = [](int frameCounter) -> InputSystemResult
     {
@@ -106,8 +106,9 @@ PHYSICS_TEST(jumpTricky)
         frameCounter++;
     }
 
-    bool isPlayerPassedPlatform = player.box.getCenter().x > 1;
+    bool isPlayerPassedPlatform = player.rect.getCenter().x > 1;
     result.assert(isPlayerPassedPlatform, "Player collided with vertical part after already passed it");
 
     return result;
 }
+

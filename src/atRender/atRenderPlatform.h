@@ -1,18 +1,11 @@
 #pragma once
+#include <span>
 #include "raylib.h"
+#include "../atResource/atResourcePlatformAtlas.h"
 
-struct atPlatformRender
+struct atRenderPlatform
 {
-    struct Atlas
-    {
-        Texture2D texture;
-        Rectangle recLeft;
-        Rectangle recMid;
-        Rectangle recRight;
-        float offset_y = 0;
-    };
-
-    static void draw(const Atlas &atlas, const Rectangle &destRect)
+    static void draw(const atResourcePlatformAtlas &atlas, const Rectangle &destRect)
     {
         const float ratio_toDest = destRect.height / atlas.recLeft.height;
 
@@ -42,11 +35,11 @@ struct atPlatformRender
         DrawTexturePro(atlas.texture, atlas.recRight, destRectDraw, origin, 0.0f, WHITE);
     }
 
-    static void drawSpan(const atPlatformRender::Atlas &atlas, std::span<const Rectangle> destRects)
+    static void drawSpan(const atResourcePlatformAtlas &atlas, std::span<const Rectangle> destRects)
     {
         for (const auto &rect : destRects)
         {
-            atPlatformRender::draw(atlas, rect);
+            atRenderPlatform::draw(atlas, rect);
             DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
         }
     }
