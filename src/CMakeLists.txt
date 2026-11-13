@@ -15,9 +15,9 @@ add_subdirectory(../3rdParty/raylib ${CMAKE_BINARY_DIR}/raylib)
 #   add_game_executable(<target_name> <sources...> [NO_CONSOLE])
 #
 # Examples:
-#   add_game_executable(AnimeTower main.cpp)
-#   add_game_executable(AnimeTower_Tests main_Tests.cpp PhysicsTests/PhysicsTest.cpp)
-#   add_game_executable(AnimeTower_Dist main.cpp NO_CONSOLE)
+#   add_game_executable(atGame main.cpp)
+#   add_game_executable(atTests main_Tests.cpp PhysicsTests/PhysicsTest.cpp)
+#   add_game_executable(atGame main.cpp NO_CONSOLE)
 # =============================================================================
 function(add_game_executable TARGET_NAME)
     set(options NO_CONSOLE)
@@ -45,9 +45,9 @@ endfunction()
 option(BUILD_NO_CONSOLE "Build game without console window (Windows GUI subsystem)" OFF)
 
 if(BUILD_NO_CONSOLE)
-    add_game_executable(${PROJECT_NAME} main.cpp NO_CONSOLE)
+    add_game_executable(atGame main.cpp NO_CONSOLE)
 else()
-    add_game_executable(${PROJECT_NAME} main.cpp)
+    add_game_executable(atGame main.cpp)
 endif()
 
 # =============================================================================
@@ -61,12 +61,12 @@ set(TEST_SOURCES
 )
 
 if(BUILD_TESTS_NO_CONSOLE)
-    add_game_executable(${PROJECT_NAME}_Tests ${TEST_SOURCES} NO_CONSOLE)
+    add_game_executable(atTests ${TEST_SOURCES} NO_CONSOLE)
 else()
-    add_game_executable(${PROJECT_NAME}_Tests ${TEST_SOURCES})
+    add_game_executable(atTests ${TEST_SOURCES})
 endif()
 
 # =============================================================================
 # Tile Template Generator executable
 # =============================================================================
-add_game_executable(${PROJECT_NAME}_TileTemplateGenerator main_TileTemplateGenerator.cpp)
+add_game_executable(atTileTemplateGenerator main_TileTemplateGenerator.cpp)

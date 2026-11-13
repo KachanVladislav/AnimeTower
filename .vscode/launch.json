@@ -2,82 +2,82 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "AnimeTower Debug",
+            "name": "atGame Debug",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug/Debug/AnimeTower.exe",
+            "program": "${workspaceFolder}/build/debug/Debug/atGame.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "externalTerminal",
             "saveAllBeforeStart": true,
-            "preLaunchTask": "Build Debug AnimeTower"
+            "preLaunchTask": "Build Debug atGame"
         },
         {
-            "name": "AnimeTower Release",
+            "name": "atGame Release",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/release/Release/AnimeTower.exe",
+            "program": "${workspaceFolder}/build/release/Release/atGame.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "externalTerminal",
             "saveAllBeforeStart": true,
-            "preLaunchTask": "Build Release AnimeTower"
+            "preLaunchTask": "Build Release atGame"
         },
         {
-            "name": "AnimeTower Dist",
+            "name": "atGame Dist",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dist/Release/AnimeTower.exe",
+            "program": "${workspaceFolder}/build/dist/Release/atGame.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "internalConsole",
             "saveAllBeforeStart": true,
-            "preLaunchTask": "Build Dist AnimeTower"
+            "preLaunchTask": "Build Dist atGame"
         },
         {
-            "name": "AnimeTower_Tests Debug",
+            "name": "atTests Debug",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug/Debug/AnimeTower_Tests.exe",
+            "program": "${workspaceFolder}/build/debug/Debug/atTests.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "externalTerminal",
             "saveAllBeforeStart": true,
-            "preLaunchTask": "Build Debug AnimeTower_Tests"
+            "preLaunchTask": "Build Debug atTests"
         },
         {
-            "name": "AnimeTower_Tests Release",
+            "name": "atTests Release",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/release/Release/AnimeTower_Tests.exe",
+            "program": "${workspaceFolder}/build/release/Release/atTests.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "externalTerminal",
             "saveAllBeforeStart": true,
-            "preLaunchTask": "Build Release AnimeTower_Tests"
+            "preLaunchTask": "Build Release atTests"
         },
         {
-            "name": "AnimeTower_TileTemplateGenerator Debug",
+            "name": "atTileTemplateGenerator Debug",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug/Debug/AnimeTower_TileTemplateGenerator.exe",
+            "program": "${workspaceFolder}/build/debug/Debug/atTileTemplateGenerator.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "externalTerminal",
             "saveAllBeforeStart": true,
-            "preLaunchTask": "Build Debug AnimeTower_TileTemplateGenerator"
+            "preLaunchTask": "Build Debug atTileTemplateGenerator"
         }
     ]
 }

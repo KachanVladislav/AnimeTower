@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 set PRESET=dist
-set TARGET=AnimeTower
+set TARGET=atGame
 
 echo ===================================================
 echo [1/5] Configuring project (Preset: %PRESET%)...
@@ -25,9 +25,9 @@ if %ERRORLEVEL% NEQ 0 (
 )
 cd ..
 
-set EXE_NAME=AnimeTower.exe
+set EXE_NAME=atGame.exe
 set EXE_BUILDED_DIR=build\dist\Release
-set STAGE_DIR=distribution\AnimeTower
+set STAGE_DIR=distribution\atGame
 echo.
 echo ===================================================
 echo [3/5] Copy: %EXE_BUILDED_DIR%\%EXE_NAME% to %STAGE_DIR%
@@ -56,7 +56,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 for /f "tokens=*" %%a in ('powershell -Command "Get-Date -Format 'yyyy-MM-dd_HH-mm'"') do set DT=%%a
-set ZIP_NAME=AnimeTower_%DT%.zip
+set ZIP_NAME=atGame_%DT%.zip
 set DIST_SIR=distribution
 echo.
 echo ===================================================
