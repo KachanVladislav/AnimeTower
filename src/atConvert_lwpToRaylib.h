@@ -25,3 +25,11 @@ struct atConvert_lwpToRaylib
         return rects_raylib;
     }
 };
+
+struct atConvert_RaylibTolwp
+{
+    static lwp::Vector2f position(const Vector2 &pos_raylib)
+    {
+        return lwp::Vector2f{pos_raylib.x, -pos_raylib.y};
+    }
+};

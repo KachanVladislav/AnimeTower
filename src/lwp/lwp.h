@@ -70,6 +70,11 @@ namespace lwp
         Rectangle rect{};
         Vector2f speed{};
         bool onFloor = false;
+        void setPos(const Vector2f& pos) 
+        {
+            rect.setX_Left(pos.x);
+            rect.setY_Bottom(pos.y);
+        }
         void applySpeedToBoxPos(float dT)
         {
             rect.move({speed.x * dT, speed.y * dT});

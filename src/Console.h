@@ -16,8 +16,8 @@ public:
         log("{} x {:.1f} y {:.1f}\n", tag, vec.x, vec.y);
     }
 
-    static void logRectangle(std::string_view tag, const lwp::Rectangle &rect)
+    static void logRect(std::string_view tag, const lwp::Rectangle &rect)
     {
-        log("{} x {:.1f} y {:.1f} bottom {:.1f}\n", tag, rect.x, rect.y, rect.getY_Bottom());
+        log("{} x {:.1f}, y {:.1f}, w {:.1f}, h {:.1f}\n", tag, rect.x, rect.y, rect.width, rect.height);
     }
 };
