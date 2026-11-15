@@ -1,12 +1,13 @@
 #pragma once
-#include "atLevelDesignerModeInterface.h"
+#include "atLevelDesignerMode_Interface.h"
+#include <memory>
 
 struct atLevelDesignerMode_PlacePlatform : public atLevelDesignerModeInterface
 {
     bool is1stCornerSelected = false;
     lwp::Vector2f firstCornerPos_lwp;
 
-    void beforeRender(atLevelDesigner_Data &data) override
+    void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter) override
     {
         if (!is1stCornerSelected)
         {
@@ -25,8 +26,9 @@ struct atLevelDesignerMode_PlacePlatform : public atLevelDesignerModeInterface
                 if (platform.width > 0.01f && platform.height > 0.01f)
                 {
                     is1stCornerSelected = false;
-                    data.levelData.horizontalPlatforms_lwp.push_back(platform);
-                    data.renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(data.levelData.horizontalPlatforms_lwp);
+                    int index = static_cast<int>(data.levelData.horizontalPlatforms_lwp.size());
+                    auto op = std::make_unique<atLevelDesignerOp_CreatePlatform>(platform, index);
+                    opExecuter.execute(std::move(op), data);
                 }
             }
             if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
@@ -35,7 +37,7 @@ struct atLevelDesignerMode_PlacePlatform : public atLevelDesignerModeInterface
             }
         }
     }
-    void afterRender(atLevelDesigner_Data &) override
+    void afterRender(atLevelDesigner_Data &, atLevelDesignerOp_Executer &) override
     {
     }
 

@@ -1,7 +1,8 @@
 #pragma once
-#include "atLevelDesignerModeInterface.h"
+#include "atLevelDesignerMode_Interface.h"
 #include "../Console.h"
 #include <algorithm>
+#include <memory>
 
 struct atLevelDesignerSelection
 {
@@ -10,14 +11,7 @@ struct atLevelDesignerSelection
     lwp::Vector2f areaSelectStart;
     lwp::Vector2f areaSelectEnd;
 
-    struct DeletedPlatforms
-    {
-        std::vector<lwp::Rectangle> platforms;
-        std::vector<int> originalIndices;
-    };
-    std::vector<DeletedPlatforms> undoStack;
-
-    void update(atLevelDesigner_Data &data)
+    void update(atLevelDesigner_Data &data, atLevelDesignerOp_Executer& opExecuter)
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
@@ -73,12 +67,9 @@ struct atLevelDesignerSelection
         }
         if (IsKeyPressed(KEY_D) && !selectedPlatformIndices.empty())
         {
-            deleteSelected(data);
+            deleteSelected(data, opExecuter);
         }
-        if (IsKeyPressed(KEY_Z) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) && !undoStack.empty())
-        {
-            undo(data);
-        }
+        
     }
 
     void render(atLevelDesigner_Data &data)
@@ -100,37 +91,20 @@ struct atLevelDesignerSelection
     void clear()
     {
         selectedPlatformIndices.clear();
-        undoStack.clear();
     }
 
 private:
-    void deleteSelected(atLevelDesigner_Data &data)
+    void deleteSelected(atLevelDesigner_Data &data, atLevelDesignerOp_Executer& opExecuter)
     {
-        DeletedPlatforms deleted;
-        deleted.originalIndices = selectedPlatformIndices;
-        std::sort(selectedPlatformIndices.begin(), selectedPlatformIndices.end());
-        for (int i = static_cast<int>(selectedPlatformIndices.size()) - 1; i >= 0; --i)
+        std::vector<lwp::Rectangle> platforms;
+        std::vector<int> indices = selectedPlatformIndices;
+        std::sort(indices.begin(), indices.end());
+        for (int idx : indices)
         {
-            deleted.platforms.push_back(data.levelData.horizontalPlatforms_lwp[selectedPlatformIndices[i]]);
-            data.levelData.horizontalPlatforms_lwp.erase(data.levelData.horizontalPlatforms_lwp.begin() + selectedPlatformIndices[i]);
+            platforms.push_back(data.levelData.horizontalPlatforms_lwp[idx]);
         }
-        std::reverse(deleted.platforms.begin(), deleted.platforms.end());
-        undoStack.push_back(std::move(deleted));
-        data.renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(data.levelData.horizontalPlatforms_lwp);
+        auto op = std::make_unique<atLevelDesignerOp_DeletePlatforms>(std::move(platforms), std::move(indices));
+        opExecuter.execute(std::move(op), data);
         selectedPlatformIndices.clear();
-    }
-
-    void undo(atLevelDesigner_Data &data)
-    {
-        DeletedPlatforms restored = std::move(undoStack.back());
-        undoStack.pop_back();
-        for (size_t i = 0; i < restored.platforms.size(); ++i)
-        {
-            data.levelData.horizontalPlatforms_lwp.insert(
-                data.levelData.horizontalPlatforms_lwp.begin() + restored.originalIndices[i],
-                restored.platforms[i]);
-        }
-        data.renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(data.levelData.horizontalPlatforms_lwp);
-        Console::log("undo: restored {} platform(s)\n", restored.platforms.size());
     }
 };

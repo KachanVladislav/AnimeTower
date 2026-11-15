@@ -1,28 +1,13 @@
 #pragma once
-#include "../atLevel/atLevelData.h"
-#include "../atRender/atRenderLevel.h"
-#include "../atConvert_lwpToRaylib.h"
+#include "atLevelDesigner_Data.h"
+#include "atLevelDesignerOp_Executer.h"
 #include "raygui.h"
-
-struct atLevelDesigner_Data
-{
-    Camera2D camera;
-    atLevelData levelData;
-    lwp::RigidBody2D player;
-    atRenderLevelData renderData;
-
-    void updateRenderData()
-    {
-        renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(levelData.horizontalPlatforms_lwp);
-        renderData.objectsRects_raylib = atConvert_lwpToRaylib::buildRectsVector(levelData.objectsRects_lwp);
-        renderData.playerRect = atConvert_lwpToRaylib::rectangle(player.rect);
-    }
-};
+#include <memory>
 
 struct atLevelDesignerModeInterface
 {
-    virtual void beforeRender(atLevelDesigner_Data &data) = 0;
-    virtual void afterRender(atLevelDesigner_Data &data) = 0;
+    virtual void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter) = 0;
+    virtual void afterRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter) = 0;
     virtual void render_2D(atLevelDesigner_Data &data) = 0;
     virtual void render_Screen(atLevelDesigner_Data &data) = 0;
     virtual void onStart(atLevelDesigner_Data &data) = 0;
@@ -42,6 +27,7 @@ static inline lwp::Vector2f getMousePos_lwp(const Camera2D &camera)
     return atConvert_RaylibTolwp::position(mouse_raylib);
 }
 
+#include <cmath>
 static inline lwp::Rectangle buildRectangleByPos_lwp(const lwp::Vector2f pos1, const lwp::Vector2f pos2)
 {
     lwp::Rectangle rect;

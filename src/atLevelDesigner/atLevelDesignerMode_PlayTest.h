@@ -1,5 +1,5 @@
 #pragma once
-#include "atLevelDesignerModeInterface.h"
+#include "atLevelDesignerMode_Interface.h"
 #include "../InputSystem.h"
 #include "../atPhysics.h"
 #include "../atDefaults.h"
@@ -7,7 +7,7 @@
 struct atLevelDesignerMode_PlayTest : public atLevelDesignerModeInterface
 {
     InputSystem inputSystem;
-    void beforeRender(atLevelDesigner_Data &data) override
+    void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer&) override
     {
         InputSystemResult input = inputSystem.update();
         if (input.direction)
@@ -18,7 +18,7 @@ struct atLevelDesignerMode_PlayTest : public atLevelDesignerModeInterface
 
         data.renderData.playerRect = atConvert_lwpToRaylib::rectangle(data.player.rect);
     }
-    void afterRender(atLevelDesigner_Data &) override
+    void afterRender(atLevelDesigner_Data &, atLevelDesignerOp_Executer&) override
     {
     }
     void render_2D(atLevelDesigner_Data &) override

@@ -24,7 +24,7 @@ struct atLevelDesigner
     atLevelDesignerModeId currentModeId = atLevelDesignerModeId::Hub;
 
     atLevelDesigner_Data data;
-
+    atLevelDesignerOp_Executer opExecuter;
     void initialize()
     {
         data.levelData = atLevelDataLoader::loadLevelSourceData(LEVEL_PATH);
@@ -54,10 +54,11 @@ int main()
     atCamera::setCameraToScreen_lwp(levelDesigner.data.camera, atDefaults::screenWidth_lwp);
 
     atLevelDesigner_Data& data = levelDesigner.data;
+    atLevelDesignerOp_Executer& opExecuter = levelDesigner.opExecuter;
     while (!WindowShouldClose())
     {
         levelDesigner.processModeChange();
-        levelDesigner.currentMode->beforeRender(data);
+        levelDesigner.currentMode->beforeRender(data, opExecuter);
         cameraZoomPanControl.update(data.camera, data.player.rect);
 
         BeginDrawing();
@@ -73,7 +74,16 @@ int main()
         GuiLabel({10, GetScreenHeight() - 10.f, 200, 10}, mousePos_str.c_str());
 
         EndDrawing();
-        levelDesigner.currentMode->afterRender(data);
+        levelDesigner.currentMode->afterRender(data, opExecuter);
+
+        if (IsKeyPressed(KEY_Z) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)))
+        {
+            levelDesigner.opExecuter.undo(data);
+        }
+        if (IsKeyPressed(KEY_Y) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)))
+        {
+            levelDesigner.opExecuter.redo(data);
+        }
     }
 
     textures.unload();
