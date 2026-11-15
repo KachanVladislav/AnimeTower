@@ -7,7 +7,6 @@ struct atCamera
     {
         const float screenWidth = (float)GetScreenWidth();
         const float screenHeight = (float)GetScreenHeight();
-        camera.target = Vector2{0, 0};
         camera.offset = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
         camera.rotation = 0.0f;
 

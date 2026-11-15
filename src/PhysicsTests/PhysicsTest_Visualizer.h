@@ -8,7 +8,7 @@
 class PhysicsTest_Visualizer
 {
     HUD hud;
-    atCamera camera;
+    Camera2D camera;
     struct TestVisualizerSettings
     {
         int screenWidth = 800;
@@ -24,8 +24,8 @@ public:
             return;
         }
         
-        camera.initialize((float)settings.screenWidth, (float)settings.screenHeight, settings.screenWidth_lwp);
         InitWindow(settings.screenWidth, settings.screenHeight, "testAnimeTower");
+        atCamera::setCameraToScreen_lwp(camera, settings.screenWidth_lwp);
         hud.initialize();
         SetTargetFPS(data.fps);
 
@@ -41,11 +41,11 @@ public:
             InputSystemResult input = data.inputs[currentIndex];
             const lwp::RigidBody2D &player = data.playerOverFrames[currentIndex];
             Rectangle playerRect = atConvert_lwpToRaylib::rectangle(player.rect);
-            camera.setTarget_lwp(player.rect.getCenter());
+            atCamera::setCameraTarget_lwp(camera, player.rect.getCenter());
 
             BeginDrawing();
 
-            BeginMode2D(camera.camera);
+            BeginMode2D(camera);
             ClearBackground(RAYWHITE);
 
             atRenderBasic::drawRectangles(platformRectangles, GREEN);

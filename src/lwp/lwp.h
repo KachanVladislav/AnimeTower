@@ -7,6 +7,18 @@ namespace lwp
     {
         float x{};
         float y{};
+        Vector2f operator+(const Vector2f& second) const
+        {
+            return Vector2f{this->x + second.x, this->y + second.y};
+        }
+        Vector2f operator-(const Vector2f& second) const
+        {
+            return Vector2f{this->x - second.x, this->y - second.y};
+        }
+        Vector2f operator*(float rhs) const
+        {
+            return Vector2f{this->x * rhs, this->y * rhs};
+        }
     };
 
     struct Rectangle

@@ -6,6 +6,7 @@
 #include "atCamera.h"
 #include "atResource/atResourceRender.h"
 #include "atRender/atRenderLevel.h"
+#include "atCameraZoomPanControl.h"
 
 const char *LEVEL_PATH = "./resource/levels/levelFromDesigner.txt";
 struct atLevelDesigner
@@ -21,22 +22,25 @@ struct atLevelDesigner
     };
     atLevelDesignerModeInterface *currentMode = &modeHub;
     atLevelDesignerModeId currentModeId = atLevelDesignerModeId::Hub;
-    
+
     atLevelDesigner_Data data;
-    
+
     void initialize()
     {
         data.levelData = atLevelDataLoader::loadLevelSourceData(LEVEL_PATH);
         data.player.rect = lwp::Rectangle::build_BottomCenter(data.levelData.playerPos, {atDefaults::playerW_lwp, atDefaults::playerH_lwp});
         data.updateRenderData();
     }
-    
+
     void processModeChange();
     atLevelDesignerModeInterface *getModeById(atLevelDesignerModeId modeId);
 };
 
+
+
 int main()
 {
+    atCameraZoomPanControl cameraZoomPanControl;
     atLevelDesigner levelDesigner;
     levelDesigner.initialize();
     SetTraceLogLevel(LOG_WARNING); // raylib  logs
@@ -46,31 +50,30 @@ int main()
 
     atResourceRender textures;
     textures.load();
-        
+
     atCamera::setCameraToScreen_lwp(levelDesigner.data.camera, atDefaults::screenWidth_lwp);
 
+    atLevelDesigner_Data& data = levelDesigner.data;
     while (!WindowShouldClose())
     {
         levelDesigner.processModeChange();
-
-        levelDesigner.currentMode->beforeRender(levelDesigner.data);
+        levelDesigner.currentMode->beforeRender(data);
+        cameraZoomPanControl.update(data.camera, data.player.rect);
 
         BeginDrawing();
 
-        atCamera::setCameraTarget_lwp(levelDesigner.data.camera, levelDesigner.data.player.rect.getCenter());
-
-        BeginMode2D(levelDesigner.data.camera);
-        atRenderLevel::render(levelDesigner.data.renderData, textures);
-        levelDesigner.currentMode->render_2D(levelDesigner.data);
+        BeginMode2D(data.camera);
+        atRenderLevel::render(data.renderData, textures);
+        levelDesigner.currentMode->render_2D(data);
         EndMode2D();
-        levelDesigner.currentMode->render_Screen(levelDesigner.data);
+        levelDesigner.currentMode->render_Screen(data);
 
-        lwp::Vector2f mousePos_lwp = getMousePos_lwp(levelDesigner.data.camera);
+        lwp::Vector2f mousePos_lwp = getMousePos_lwp(data.camera);
         auto mousePos_str = std::format("{:.1f} {:.1f}", mousePos_lwp.x, mousePos_lwp.y);
         GuiLabel({10, GetScreenHeight() - 10.f, 200, 10}, mousePos_str.c_str());
 
         EndDrawing();
-        levelDesigner.currentMode->afterRender(levelDesigner.data);
+        levelDesigner.currentMode->afterRender(data);
     }
 
     textures.unload();
@@ -79,7 +82,7 @@ int main()
     return 0;
 }
 
-atLevelDesignerModeInterface* atLevelDesigner::getModeById(atLevelDesignerModeId modeId)
+atLevelDesignerModeInterface *atLevelDesigner::getModeById(atLevelDesignerModeId modeId)
 {
     if (modeId == atLevelDesignerModeId::Hub)
         return &modeHub;
