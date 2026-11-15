@@ -46,8 +46,8 @@ int main()
 
     atResourceRender textures;
     textures.load();
-    atCamera camera;
-    camera.initialize(atDefaults::screenWidth, atDefaults::screenHeight, atDefaults::screenWidth_lwp);
+        
+    atCamera::setCameraToScreen_lwp(levelDesigner.data.camera, atDefaults::screenWidth_lwp);
 
     while (!WindowShouldClose())
     {
@@ -57,16 +57,15 @@ int main()
 
         BeginDrawing();
 
-        camera.setTarget_lwp(levelDesigner.data.player.rect.getCenter());
-        levelDesigner.data.camera = camera.camera;
+        atCamera::setCameraTarget_lwp(levelDesigner.data.camera, levelDesigner.data.player.rect.getCenter());
 
-        BeginMode2D(camera.camera);
+        BeginMode2D(levelDesigner.data.camera);
         atRenderLevel::render(levelDesigner.data.renderData, textures);
         levelDesigner.currentMode->render_2D(levelDesigner.data);
         EndMode2D();
         levelDesigner.currentMode->render_Screen(levelDesigner.data);
 
-        lwp::Vector2f mousePos_lwp = getMousePos_lwp(camera.camera);
+        lwp::Vector2f mousePos_lwp = getMousePos_lwp(levelDesigner.data.camera);
         auto mousePos_str = std::format("{:.1f} {:.1f}", mousePos_lwp.x, mousePos_lwp.y);
         GuiLabel({10, GetScreenHeight() - 10.f, 200, 10}, mousePos_str.c_str());
 

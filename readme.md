@@ -1,6 +1,6 @@
 # AnimeTower
 
-AnimeTower game engine with raylib. 
+AnimeTower game with raylib. 
 
 ![AnimeTower screenshot](screenshot.png)
 

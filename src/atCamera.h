@@ -3,17 +3,18 @@
 
 struct atCamera
 {
-    Camera2D camera{};
-    void initialize(float screenWidth, float screenHeight, float screenWidth_lwp)
+    static void setCameraToScreen_lwp(Camera2D &camera, float screenWidth_lwp)
     {
+        const float screenWidth = (float)GetScreenWidth();
+        const float screenHeight = (float)GetScreenHeight();
         camera.target = Vector2{0, 0};
         camera.offset = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
         camera.rotation = 0.0f;
 
         camera.zoom = screenWidth / screenWidth_lwp;
     }
-    void setTarget_lwp(const lwp::Vector2f pos)
+    static void setCameraTarget_lwp(Camera2D &camera, const lwp::Vector2f targetPos)
     {
-        camera.target = atConvert_lwpToRaylib::position(pos);
+        camera.target = atConvert_lwpToRaylib::position(targetPos);
     }
 };

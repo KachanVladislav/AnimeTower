@@ -41,8 +41,8 @@ int main()
     InputSystem inputSystem;
     atResourceRender textures;
     textures.load();
-    atCamera camera;
-    camera.initialize(atDefaults::screenWidth, atDefaults::screenHeight, atDefaults::screenWidth_lwp);
+    Camera2D camera;
+    atCamera::setCameraToScreen_lwp(camera, atDefaults::screenWidth_lwp);
     HUD hud;
     hud.initialize();
 
@@ -59,8 +59,8 @@ int main()
 
         BeginDrawing();
 
-        camera.setTarget_lwp(player.rect.getCenter());
-        BeginMode2D(camera.camera);
+        atCamera::setCameraTarget_lwp(camera, player.rect.getCenter());
+        BeginMode2D(camera);
         atRenderLevel::render(renderData, textures);
 
         EndMode2D();
