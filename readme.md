@@ -92,6 +92,14 @@ cmake --build --preset debug --target atGame
 cd ..
 ```
 
+# Documentation [not really useful]
+Generate API docs with [Doxygen](https://doxygen.nl/) + [Graphviz](https://graphviz.org/):
+```bash
+doxygen Doxyfile
+```
+Output: `doxygen/html/index.html`
+
+Diagrams (call graphs, include graphs) require Graphviz in PATH.
 
 # license
 

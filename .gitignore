@@ -2,6 +2,9 @@
 build/
 distribution/
 
+# Doxygen output
+doxygen/
+
 # IDE files (keep .vscode for debug config)
 .vs/
 *.suo
