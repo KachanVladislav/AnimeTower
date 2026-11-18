@@ -2,6 +2,7 @@
 #include <span>
 #include "lwp/lwp.h"
 #include "InputSystem.h"
+#include "atLevel/atLevelData.h"
 
 struct atPhysics
 {
@@ -9,9 +10,10 @@ struct atPhysics
     static inline const float MAX_SPEED = 5;
     static inline const float JUMP_SPEED = 5;
 
-    static void applyInputToRigidBody(lwp::RigidBody2D &body, const InputSystemResult &input)
+    static void applyInputToRigidBody(atObject &rigidBody, const InputSystemResult &input)
     {
-        if (body.isOnFloor())
+        auto &body = rigidBody.rigidBody;
+        if (body.isOnFloor)
         {
             if (input.direction)
             {
@@ -33,42 +35,66 @@ struct atPhysics
     }
 
     /// @brief apply gravity, resolve collisions
-    static void updatePhysics(lwp::RigidBody2D &player, std::span<lwp::Rectangle> staticObjects, float dT)
+    static void updatePhysics(std::span<atObject> rigidBodies, std::span<atObject> objectsStatic, float dT)
     {
-        float playerBottomBefore = player.rect.getY_Bottom();
-
-        player.speed.y = player.speed.y - g * dT;
-        player.applySpeedToBoxPos(dT);
-        player.onFloor = false;
-
-        float playerBottom = player.rect.getY_Bottom();
-        for (const auto box : staticObjects)
+        for (auto &rigidBody : rigidBodies)
         {
-            // floor collision
-            if (playerBottomBefore >= box.getY_Top() && playerBottom <= box.getY_Top()) // y-level
-            {
-                bool notAligned_x = player.rect.getX_Right() < box.getX_Left() || player.rect.getX_Left() > box.getX_Right();
-                if (!notAligned_x) // x-level
-                    player.setOnFloor(box.getY_Top());
-            }
+            applyGravityToRigidBody(rigidBody, dT);
+            for (auto &objectStatic : objectsStatic)
+                resolveStaticCollision(rigidBody, objectStatic);
+        }
+    }
 
-            // same y-level
-            if (player.rect.getY_Bottom() < box.getY_Top() && player.rect.getY_Top() > box.getY_Top())
-            {
-                // right collision
-                if (player.rect.getX_Right() > box.getX_Left() && player.rect.getX_Left() < box.getX_Left())
-                {
-                    if(player.speed.x > 0)
-                        player.rect.setX_Right(box.getX_Left());
-                }
+    static void applyGravityToRigidBody(atObject &obj1, float dT)
+    {
+        obj1.rigidBody.speed.y -= g * dT;
+        obj1.transform.pos.x += obj1.rigidBody.speed.x * dT;
+        obj1.transform.pos.y += obj1.rigidBody.speed.y * dT;
+        obj1.rigidBody.isOnFloor = false;
+    }
 
-                // left collision
-                if (player.rect.getX_Left() < box.getX_Right() && player.rect.getX_Right() > box.getX_Right())
-                {
-                    if(player.speed.x < 0)
-                        player.rect.setX_Left(box.getX_Right());
-                }
+    static void resolveStaticCollision(atObject &rigid, atObject &stat)
+    {
+        auto rb = rigid.getColliderRect();
+        auto sb = stat.getColliderRect();
+
+        bool overlapX = rb.x < sb.x + sb.width && rb.x + rb.width > sb.x;
+        bool overlapY = rb.y < sb.y + sb.height && rb.y + rb.height > sb.y;
+        if (!overlapX || !overlapY)
+            return;
+
+        float overlapLeft = (rb.x + rb.width) - sb.x;
+        float overlapRight = (sb.x + sb.width) - rb.x;
+        float overlapBottom = (rb.y + rb.height) - sb.y;
+        float overlapTop = (sb.y + sb.height) - rb.y;
+
+        float minOverlapX = std::min(overlapLeft, overlapRight);
+        float minOverlapY = std::min(overlapBottom, overlapTop);
+
+        if (minOverlapX < minOverlapY)
+        {
+            float colliderX = 0;
+            if (overlapLeft < overlapRight)
+                colliderX = sb.x - rb.width;
+            else
+                colliderX = sb.x + sb.width;
+            // rigid.rigidBody.speed.x = 0;
+            rigid.transform.pos.x = colliderX - rigid.collider.offset.x;
+        }
+        else
+        {
+            float colliderY = 0;
+            if (overlapBottom < overlapTop)
+            {
+                colliderY = sb.y - rb.height;
             }
+            else
+            {
+                rigid.rigidBody.isOnFloor = true;
+                colliderY = sb.y + sb.height;
+            }
+            rigid.rigidBody.speed.y = 0;
+            rigid.transform.pos.y = colliderY - rigid.collider.offset.y;
         }
     }
 };

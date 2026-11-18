@@ -1,15 +1,16 @@
 #pragma once
+#include "atLevel/atLevelData.h"
 #include <vector>
 #include <span>
 #include <format>
 #include "../InputSystem.h"
-#include "../lwp/lwp.h"
+
 
 struct PhysicsTest_PhysicsData
 {
     std::vector<InputSystemResult> inputs{};
-    std::vector<lwp::RigidBody2D> playerOverFrames{};
-    std::vector<lwp::Rectangle> staticPlatforms{};
+    std::vector<atObject> playerOverFrames{};
+    std::vector<atObject> staticPlatforms{};
     int fps = 120;
 };
 

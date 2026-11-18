@@ -31,7 +31,7 @@ function(add_game_executable TARGET_NAME)
     
     # Link raylib
     target_link_libraries(${TARGET_NAME} PRIVATE raylib)
-    
+    target_include_directories(${TARGET_NAME} PRIVATE .)
     # Set Windows GUI subsystem when building without console
     if(WIN32 AND ARG_NO_CONSOLE)
         target_link_options(${TARGET_NAME} PRIVATE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")

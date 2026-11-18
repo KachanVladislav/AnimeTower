@@ -27,16 +27,12 @@ struct atLevelDesigner
     atLevelDesignerOp_Executer opExecuter;
     void initialize()
     {
-        data.levelData = atLevelDataLoader::loadLevelSourceData(LEVEL_PATH);
-        data.player.rect = lwp::Rectangle::build_BottomCenter(data.levelData.playerPos, {atDefaults::playerW_lwp, atDefaults::playerH_lwp});
-        data.updateRenderData();
+        atLevelDataLoader::loadLevelSourceData(LEVEL_PATH, data.levelData);
     }
 
     void processModeChange();
     atLevelDesignerModeInterface *getModeById(atLevelDesignerModeId modeId);
 };
-
-
 
 int main()
 {
@@ -53,18 +49,22 @@ int main()
 
     atCamera::setCameraToScreen_lwp(levelDesigner.data.camera, atDefaults::screenWidth_lwp);
 
-    atLevelDesigner_Data& data = levelDesigner.data;
-    atLevelDesignerOp_Executer& opExecuter = levelDesigner.opExecuter;
+    atLevelDesigner_Data &data = levelDesigner.data;
+    atLevelDesignerOp_Executer &opExecuter = levelDesigner.opExecuter;
     while (!WindowShouldClose())
     {
         levelDesigner.processModeChange();
         levelDesigner.currentMode->beforeRender(data, opExecuter);
-        cameraZoomPanControl.update(data.camera, data.player.rect);
+        atObject *player = levelDesigner.data.levelData.playerRef.resolve();
+        if (player)
+            cameraZoomPanControl.update(data.camera, player->getColliderRect());
+        else
+            cameraZoomPanControl.update(data.camera, player->getColliderRect());
 
         BeginDrawing();
 
         BeginMode2D(data.camera);
-        atRenderLevel::render(data.renderData, textures);
+        atRenderLevel::render(data.levelData, textures);
         levelDesigner.currentMode->render_2D(data);
         EndMode2D();
         levelDesigner.currentMode->render_Screen(data);

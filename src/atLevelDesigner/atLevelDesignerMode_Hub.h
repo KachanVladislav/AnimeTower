@@ -9,7 +9,11 @@ struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
 
     void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter) override
     {
-        selection.update(data, opExecuter);
+        selection.update(data);
+        if (IsKeyPressed(KEY_D))
+        {
+            deleteSelected(data, opExecuter);
+        }
     }
     void afterRender(atLevelDesigner_Data &, atLevelDesignerOp_Executer &) override
     {
@@ -24,18 +28,42 @@ struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
         {
             atLevelDataLoader::saveLevelSourceData(LEVEL_PATH_TO_SAVE, data.levelData); // should not be here
         }
-        if (!selection.selectedPlatformIndices.empty())
+        if (!selection.selectedPlatformIds.empty())
         {
-            std::string text = std::format("selected: {} platform(s) | D - delete", selection.selectedPlatformIndices.size());
+            std::string text = std::format("selected: {} platform(s) | D - delete", selection.selectedPlatformIds.size());
             StatusBar_renderText(text.c_str());
         }
-        StatusBar_renderText("designer | B - build, F1 - play");
+        else
+            StatusBar_renderText("designer | B - build, F1 - play");
     }
     void onStart(atLevelDesigner_Data &) override
     {
     }
     void onExit(atLevelDesigner_Data &) override
     {
+        selection.clear();
+    }
+
+private:
+    void deleteSelected(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter)
+    {
+        if (selection.selectedPlatformIds.empty())
+            return;
+        std::vector<atObject> platforms;
+        std::vector<uint32_t> ids = selection.selectedPlatformIds;
+        for (uint32_t id : ids)
+        {
+            for (const auto &obj : data.levelData.objectsStatic)
+            {
+                if (obj.id == id)
+                {
+                    platforms.push_back(obj);
+                    break;
+                }
+            }
+        }
+        auto op = std::make_unique<atLevelDesignerOp_DeletePlatforms>(std::move(platforms), std::move(ids));
+        opExecuter.execute(std::move(op), data);
         selection.clear();
     }
 };

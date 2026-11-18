@@ -1,9 +1,7 @@
 #pragma once
-#include "PhysicsTest_Visualizer.h"
-#include "../hud/hud.h"
-#include "../atCamera.h"
-#include "../atConvert_lwpToRaylib.h"
-#include "../atRender/atRenderBasic.h"
+#include "atRender/atRenderBasic.h"
+#include "hud/hud.h"
+#include "atCamera.h"
 
 class PhysicsTest_Visualizer
 {
@@ -34,20 +32,26 @@ public:
         const float dT = 1 / (float)data.fps;
         const float maxTime = maxIndex * dT;
 
-        std::vector<Rectangle> platformRectangles = atConvert_lwpToRaylib::buildRectsVector(data.staticPlatforms);
+        std::vector<Rectangle> platformRectangles;
+        platformRectangles.reserve(data.staticPlatforms.size());
+        for(int i = 0; i < data.staticPlatforms.size(); i++)
+            platformRectangles.push_back(atConvert_lwpToRaylib::rectangle(data.staticPlatforms[i].getColliderRect()));
 
         while (!WindowShouldClose())
         {
             InputSystemResult input = data.inputs[currentIndex];
-            const lwp::RigidBody2D &player = data.playerOverFrames[currentIndex];
-            Rectangle playerRect = atConvert_lwpToRaylib::rectangle(player.rect);
-            atCamera::setCameraTarget_lwp(camera, player.rect.getCenter());
+            const atObject &player = data.playerOverFrames[currentIndex];
+            Rectangle playerRect = atConvert_lwpToRaylib::rectangle(player.getColliderRect());
+
+            atCamera::setCameraTarget_lwp(camera, player.getColliderRect().getCenter());
 
             BeginDrawing();
 
             BeginMode2D(camera);
             ClearBackground(RAYWHITE);
 
+            // atRenderLevel::render()
+            
             atRenderBasic::drawRectangles(platformRectangles, GREEN);
             atRenderBasic::drawRectangles({&playerRect, 1}, PINK);
             EndMode2D();

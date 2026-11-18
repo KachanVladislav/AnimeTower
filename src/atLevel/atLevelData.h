@@ -1,13 +1,19 @@
 #pragma once
 #include <vector>
-#include "../lwp/lwp.h"
+#include "atObject.h"
+#include "atObjectRef.h"
+#include "atObjectUniqueIdBuilder.h"
 
 struct atLevelData
 {
-    std::vector<lwp::Rectangle> horizontalPlatforms_lwp;
-    std::vector<lwp::Rectangle> objectsRects_lwp;
+    atObjectUniqueIdBuilder objectBuilder;
 
-    lwp::Vector2f playerPos;
+    std::vector<atObject> objectsStatic;
+    std::vector<atObject> objectsRigid;
+    std::vector<atObject> objectsNotCollidable;
+
+    atObjectRefToVector playerRef;
+    lwp::Vector2f playerDefaultPos;
 };
 
 #include <fstream>
@@ -23,55 +29,57 @@ struct atLevelDataLoader
             return;
         }
 
-        file << "playerPos " << levelData.playerPos.x << " " << levelData.playerPos.y << "\n";
+        file << "playerPos " << levelData.playerDefaultPos.x << " " << levelData.playerDefaultPos.y << "\n";
 
-        saveRectangles(file, "horizontalPlatforms", levelData.horizontalPlatforms_lwp);
-        saveRectangles(file, "objectsRects", levelData.objectsRects_lwp);
+        saveRectangles(file, "objectsStatic", levelData.objectsStatic);
+        saveRectangles(file, "objectsNotCollidable", levelData.objectsNotCollidable);
 
         file.close();
     }
 
-    static atLevelData loadLevelSourceData(const char *fileName)
+    static void loadLevelSourceData(const char *fileName, atLevelData &result)
     {
-        atLevelData result{};
-
         std::ifstream file(fileName);
         if (!file.is_open())
         {
             std::cerr << "Failed to open file for reading: " << fileName << std::endl;
-            return result;
+            return;
         }
 
         std::string token;
 
-        file >> token >> result.playerPos.x >> result.playerPos.y;
-
-        loadRectangles(file, result.horizontalPlatforms_lwp);
-        loadRectangles(file, result.objectsRects_lwp);
+        file >> token >> result.playerDefaultPos.x >> result.playerDefaultPos.y;
+        atObject player = result.objectBuilder.player(result.playerDefaultPos.x, result.playerDefaultPos.y);
+        result.playerRef.set(player.id, &result.objectsRigid);
+        result.objectsRigid.push_back(player);
+        loadRectangles(file, result.objectBuilder, result.objectsStatic);
+        loadRectangles(file, result.objectBuilder, result.objectsNotCollidable);
 
         file.close();
-        return result;
     }
 
 private:
-    static void saveRectangles(std::ostream &out, const char *name, const std::vector<lwp::Rectangle> &rects)
+    static void saveRectangles(std::ostream &out, const char *name, const std::vector<atObject> &objects)
     {
-        out << name << " " << rects.size() << "\n";
-        for (const auto &rect : rects)
+        out << name << " " << objects.size() << "\n";
+        for (const auto &obj : objects)
         {
+            const auto &rect = obj.getColliderRect();
             out << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << "\n";
         }
     }
 
-    static void loadRectangles(std::istream &in, std::vector<lwp::Rectangle> &rects)
+    static void loadRectangles(std::istream &in, atObjectUniqueIdBuilder &builder, std::vector<atObject> &data)
     {
         std::string token;
         size_t count;
         in >> token >> count;
-        rects.resize(count);
-        for (auto &rect : rects)
+        data.clear();
+        for (size_t i = 0; i < count; i++)
         {
+            lwp::Rectangle rect;
             in >> rect.x >> rect.y >> rect.width >> rect.height;
+            data.push_back(builder.fromColliderRect(rect));
         }
     }
 };

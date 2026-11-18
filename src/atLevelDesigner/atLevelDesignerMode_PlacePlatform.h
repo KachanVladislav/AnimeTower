@@ -26,8 +26,7 @@ struct atLevelDesignerMode_PlacePlatform : public atLevelDesignerModeInterface
                 if (platform.width > 0.01f && platform.height > 0.01f)
                 {
                     is1stCornerSelected = false;
-                    int index = static_cast<int>(data.levelData.horizontalPlatforms_lwp.size());
-                    auto op = std::make_unique<atLevelDesignerOp_CreatePlatform>(platform, index);
+                    auto op = std::make_unique<atLevelDesignerOp_CreatePlatform>(data.levelData.objectBuilder.fromColliderRect(platform));
                     opExecuter.execute(std::move(op), data);
                 }
             }

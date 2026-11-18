@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 // lightweight physics 2d
 namespace lwp

@@ -16,35 +16,38 @@ struct atLevelDesignerOp_Interface
 
 struct atLevelDesignerOp_DeletePlatforms : public atLevelDesignerOp_Interface
 {
-    std::vector<lwp::Rectangle> platforms;
-    std::vector<int> originalIndices;
+    std::vector<atObject> platforms;
+    std::vector<uint32_t> originalIds;
 
-    atLevelDesignerOp_DeletePlatforms(std::vector<lwp::Rectangle> rects, std::vector<int> indices)
-        : platforms(std::move(rects)), originalIndices(std::move(indices))
+    atLevelDesignerOp_DeletePlatforms(std::vector<atObject> rects, std::vector<uint32_t> ids)
+        : platforms(std::move(rects)), originalIds(std::move(ids))
     {
     }
 
     void apply(atLevelDesigner_Data &data) override
     {
-        std::vector<int> sortedIndices = originalIndices;
-        std::sort(sortedIndices.begin(), sortedIndices.end());
-        for (int i = static_cast<int>(sortedIndices.size()) - 1; i >= 0; --i)
+        for (uint32_t id : originalIds)
         {
-            data.levelData.horizontalPlatforms_lwp.erase(
-                data.levelData.horizontalPlatforms_lwp.begin() + sortedIndices[i]);
+            for (auto it = data.levelData.objectsStatic.begin(); it != data.levelData.objectsStatic.end(); ++it)
+            {
+                if (it->id == id)
+                {
+                    data.levelData.objectsStatic.erase(it);
+                    break;
+                }
+            }
         }
-        data.renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(data.levelData.horizontalPlatforms_lwp);
     }
 
     void undo(atLevelDesigner_Data &data) override
     {
-        for (size_t i = 0; i < platforms.size(); ++i)
+        originalIds.clear();
+        for (atObject obj : platforms)
         {
-            data.levelData.horizontalPlatforms_lwp.insert(
-                data.levelData.horizontalPlatforms_lwp.begin() + originalIndices[i],
-                platforms[i]);
+            data.levelData.objectBuilder.setUniqueId(obj);
+            originalIds.push_back(obj.id);
+            data.levelData.objectsStatic.push_back(obj);
         }
-        data.renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(data.levelData.horizontalPlatforms_lwp);
     }
 
     const char *getTypeName() const override { return "DeletePlatforms"; }
@@ -52,25 +55,31 @@ struct atLevelDesignerOp_DeletePlatforms : public atLevelDesignerOp_Interface
 
 struct atLevelDesignerOp_CreatePlatform : public atLevelDesignerOp_Interface
 {
-    lwp::Rectangle platform;
-    int createdIndex;
+    atObject platform;
+    uint32_t createdId = 0;
 
-    atLevelDesignerOp_CreatePlatform(lwp::Rectangle rect, int index)
-        : platform(rect), createdIndex(index)
+    atLevelDesignerOp_CreatePlatform(atObject rect)
+        : platform(rect)
     {
     }
 
     void apply(atLevelDesigner_Data &data) override
     {
-        data.levelData.horizontalPlatforms_lwp.push_back(platform);
-        data.renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(data.levelData.horizontalPlatforms_lwp);
+        data.levelData.objectBuilder.setUniqueId(platform);
+        createdId = platform.id;
+        data.levelData.objectsStatic.push_back(platform);
     }
 
     void undo(atLevelDesigner_Data &data) override
     {
-        data.levelData.horizontalPlatforms_lwp.erase(
-            data.levelData.horizontalPlatforms_lwp.begin() + createdIndex);
-        data.renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(data.levelData.horizontalPlatforms_lwp);
+        for (auto it = data.levelData.objectsStatic.begin(); it != data.levelData.objectsStatic.end(); ++it)
+        {
+            if (it->id == createdId)
+            {
+                data.levelData.objectsStatic.erase(it);
+                break;
+            }
+        }
     }
 
     const char *getTypeName() const override { return "CreatePlatform"; }

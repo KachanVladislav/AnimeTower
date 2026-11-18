@@ -1,6 +1,5 @@
 #include "PhysicsTest.h"
-#include "../atPlatformBuilder.h"
-#include "../atPhysics.h"
+#include "atPhysics.h"
 
 PHYSICS_TEST(collisionLeft)
 {
@@ -9,14 +8,13 @@ PHYSICS_TEST(collisionLeft)
     PhysicsTest_PhysicsData &physicsData = result.physicsData;
     physicsData.fps = 120;
 
-    atPlatformBuilder platformBuilder(0.5f);
+    atObjectUniqueIdBuilder objBuilder;
     physicsData.staticPlatforms = {
-        platformBuilder.buildHorizontalRight({-3.f, 0.0f}, 6.f),
-        platformBuilder.buildHorizontalLeft({-1.f, 1.4f}, 2.f),
+        objBuilder.fromColliderRect({-3.f, 0.0f - 0.5f, 6.f, 0.5f}),
+        objBuilder.fromColliderRect({-1.f, 1.4f - 0.5f, 2.f, 0.5f}),
     };
 
-    lwp::RigidBody2D player;
-    player.rect = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
+    atObject player = objBuilder.fromColliderRect({0.f, 0.2f, 1.f, 2.f});
 
     float dT = 1 / (float)physicsData.fps;
     InputSystemResult input;
@@ -24,13 +22,13 @@ PHYSICS_TEST(collisionLeft)
     for (float time = 0; time < 1; time += dT)
     {
         atPhysics::applyInputToRigidBody(player, input);
-        atPhysics::updatePhysics(player, physicsData.staticPlatforms, dT);
+        atPhysics::updatePhysics({&player, 1}, physicsData.staticPlatforms, dT);
 
         physicsData.inputs.push_back(input);
         physicsData.playerOverFrames.push_back(player);
     }
 
-    bool isPlayerCollided = player.rect.getCenter().x > -1.f;
+    bool isPlayerCollided = player.getColliderRect().getCenter().x > -1.f;
     result.assert(isPlayerCollided, "Player went through collision");
 
     return result;
@@ -39,47 +37,48 @@ PHYSICS_TEST(collisionLeft)
 PHYSICS_TEST(fallOnFloor)
 {
     PhysicsTest_Result result;
+
     PhysicsTest_PhysicsData &physicsData = result.physicsData;
     physicsData.fps = 120;
 
-    atPlatformBuilder platformBuilder(0.5f);
+    atObjectUniqueIdBuilder objBuilder;
     physicsData.staticPlatforms = {
-        platformBuilder.buildHorizontalRight({0.f, 0.0f}, 2.f),
+        objBuilder.fromColliderRect({-1.f, 0.0f - 0.5f, 4.f, 0.5f}),
     };
 
-    lwp::RigidBody2D player;
-    player.rect = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
+    atObject player = objBuilder.fromColliderRect({0.f, 0.2f, 1.f, 2.f});
 
     float dT = 1 / (float)physicsData.fps;
     for (float time = 0; time < 1; time += dT)
     {
         InputSystemResult input;
         atPhysics::applyInputToRigidBody(player, input);
-        atPhysics::updatePhysics(player, physicsData.staticPlatforms, dT);
+        atPhysics::updatePhysics({&player, 1}, physicsData.staticPlatforms, dT);
 
         physicsData.inputs.push_back(input);
         physicsData.playerOverFrames.push_back(player);
     }
 
-    bool isPlayerAboveFloor = player.rect.getCenter().y > 0;
+    bool isPlayerAboveFloor = player.getColliderRect().getCenter().y > 0;
     result.assert(isPlayerAboveFloor, "Player fell under the floor");
 
     return result;
 }
 
-PHYSICS_TEST(jumpTricky)
+PHYSICS_TEST(jumpTricky) // here to check test vizualizer and to remeber about jump idea
 {
     PhysicsTest_Result result;
+
     PhysicsTest_PhysicsData &physicsData = result.physicsData;
     physicsData.fps = 120;
 
-    atPlatformBuilder platformBuilder(0.5f);
+    atObjectUniqueIdBuilder objBuilder;
     physicsData.staticPlatforms = {
-        platformBuilder.buildHorizontalRight({-5.f, 0.0f}, 10.f),
-        platformBuilder.buildHorizontalRight({-0.2f, 2.1f}, 3.2f),
+        objBuilder.fromColliderRect({-5.f, 0.0f - 0.5f, 10.f, 0.5f}),
+        objBuilder.fromColliderRect({1.2f, 2.1f - 0.5f, 3.2f, 0.5f}),
     };
-    lwp::RigidBody2D player;
-    player.rect = lwp::Rectangle::build_BottomCenter({0.f, 0.f}, {1.f, 2.f});
+
+    atObject player = objBuilder.fromColliderRect({0.f, 0.2f, 1.f, 2.f});
 
     auto getInput = [](int frameCounter) -> InputSystemResult
     {
@@ -98,7 +97,7 @@ PHYSICS_TEST(jumpTricky)
     {
         InputSystemResult input = getInput(frameCounter);
         atPhysics::applyInputToRigidBody(player, input);
-        atPhysics::updatePhysics(player, physicsData.staticPlatforms, dT);
+        atPhysics::updatePhysics({&player, 1}, physicsData.staticPlatforms, dT);
 
         physicsData.inputs.push_back(input);
         physicsData.playerOverFrames.push_back(player);
@@ -106,9 +105,8 @@ PHYSICS_TEST(jumpTricky)
         frameCounter++;
     }
 
-    bool isPlayerPassedPlatform = player.rect.getCenter().x > 1;
+    bool isPlayerPassedPlatform = player.getColliderRect().getCenter().x > 1;
     result.assert(isPlayerPassedPlatform, "Player collided with vertical part after already passed it");
 
     return result;
 }
-

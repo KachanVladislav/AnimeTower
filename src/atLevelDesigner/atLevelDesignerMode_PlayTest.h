@@ -7,18 +7,20 @@
 struct atLevelDesignerMode_PlayTest : public atLevelDesignerModeInterface
 {
     InputSystem inputSystem;
-    void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer&) override
+    void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &) override
     {
         InputSystemResult input = inputSystem.update();
-        if (input.direction)
-            data.renderData.isPlayerFaceRight = (*input.direction == InputSystemDirection::right);
+        atObject* player = data.levelData.playerRef.resolve();
+        if(!player)
+            return;
+        
         float dT = GetFrameTime();
-        atPhysics::applyInputToRigidBody(data.player, input);
-        atPhysics::updatePhysics(data.player, data.levelData.horizontalPlatforms_lwp, dT);
-
-        data.renderData.playerRect = atConvert_lwpToRaylib::rectangle(data.player.rect);
+        atPhysics::applyInputToRigidBody(*player, input);
+        atPhysics::updatePhysics(data.levelData.objectsRigid, data.levelData.objectsStatic, dT);
+        if (input.direction)
+            player->isFlipX = (*input.direction == InputSystemDirection::right);
     }
-    void afterRender(atLevelDesigner_Data &, atLevelDesignerOp_Executer&) override
+    void afterRender(atLevelDesigner_Data &, atLevelDesignerOp_Executer &) override
     {
     }
     void render_2D(atLevelDesigner_Data &) override
@@ -30,7 +32,11 @@ struct atLevelDesignerMode_PlayTest : public atLevelDesignerModeInterface
     }
     void onStart(atLevelDesigner_Data &data) override
     {
-        data.player.rect = lwp::Rectangle::build_BottomCenter(data.levelData.playerPos, {atDefaults::playerW_lwp, atDefaults::playerH_lwp});
+        atObject* player = data.levelData.playerRef.resolve();
+        if(!player)
+            return;
+        player->transform.pos = data.levelData.playerDefaultPos;
+        player->rigidBody.speed = lwp::Vector2f{0, 0};
     }
     void onExit(atLevelDesigner_Data &) override
     {

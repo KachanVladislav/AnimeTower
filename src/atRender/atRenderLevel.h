@@ -4,15 +4,7 @@
 #include "../atResource/atResourceRender.h"
 #include "atRenderPlatform.h"
 #include "atRenderAnimation.h"
-
-struct atRenderLevelData
-{
-    std::vector<Rectangle> horizontalPlatforms_raylib;
-    std::vector<Rectangle> objectsRects_raylib;
-
-    Rectangle playerRect;
-    bool isPlayerFaceRight = true;
-};
+#include "atConvert_lwpToRaylib.h"
 
 static inline void drawTexture_sameHigh(const Rectangle &rect, const Texture2D &texture, bool isFacingRight)
 {
@@ -31,14 +23,32 @@ static inline void drawTexture_sameHigh(const Rectangle &rect, const Texture2D &
 
 struct atRenderLevel
 {
-    static void render(const atRenderLevelData &renderData, const atResourceRender &textures)
+    static void render(const atLevelData &data, const atResourceRender &textures)
     {
         ClearBackground(LIGHTGRAY);
-        atRenderPlatform::drawSpan(textures.platformAtlas, renderData.horizontalPlatforms_raylib);
-        // Renderer_lwpToRaylib::drawRectangles({&player.box, 1}, PINK);
-        drawTexture_sameHigh(renderData.playerRect, textures.playerTexture, renderData.isPlayerFaceRight);
-    
-        for (const auto &object : renderData.objectsRects_raylib)
-            atObjectRender::drawAnimated(textures.flagPolAtlas, (float)GetTime(), 0.15f, object);
+
+        for (const auto &obj : data.objectsStatic)
+        {
+            Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
+            auto rect = Rectangle{pos_raylib.x, pos_raylib.y, obj.collider.size.x, obj.collider.size.y};
+            atRenderPlatform::draw(textures.platformAtlas, rect);
+            DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
+        }
+
+        for (const auto &obj : data.objectsRigid)
+        {
+            Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
+            auto rect = Rectangle{pos_raylib.x, pos_raylib.y, obj.collider.size.x, obj.collider.size.y};
+            drawTexture_sameHigh(rect, textures.playerTexture, obj.isFlipX);
+            DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
+        }
+
+        for (const auto &obj : data.objectsNotCollidable)
+        {
+            Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
+            auto rect = Rectangle{pos_raylib.x, pos_raylib.y, obj.collider.size.x, obj.collider.size.y};
+            atObjectRender::drawAnimated(textures.flagPolAtlas, (float)GetTime(), 0.15f, rect);
+            DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
+        }
     }
 };

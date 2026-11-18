@@ -26,14 +26,8 @@ int main()
     // };
     // levelData.playerPos = lwp::Vector2f{1.1f, 2.f};
     // atLevelDataLoader::saveLevelSourceData("./resource/levels/defaultLevel.txt",levelData);
-    atLevelData levelData = atLevelDataLoader::loadLevelSourceData("./resource/levels/defaultLevel.txt");
-    lwp::RigidBody2D player;
-    player.rect = lwp::Rectangle::build_BottomCenter(levelData.playerPos, {atDefaults::playerW_lwp, atDefaults::playerH_lwp});
-
-    atRenderLevelData renderData;
-    renderData.horizontalPlatforms_raylib = atConvert_lwpToRaylib::buildRectsVector(levelData.horizontalPlatforms_lwp);
-    renderData.objectsRects_raylib = atConvert_lwpToRaylib::buildRectsVector(levelData.objectsRects_lwp);
-    renderData.playerRect = atConvert_lwpToRaylib::rectangle(player.rect);
+    atLevelData levelData;
+    atLevelDataLoader::loadLevelSourceData("./resource/levels/defaultLevel.txt", levelData);
 
     InitWindow(atDefaults::screenWidth, atDefaults::screenHeight, "AnimeTower");
     SetTargetFPS(120);
@@ -48,20 +42,24 @@ int main()
 
     while (!WindowShouldClose())
     {
-        float dT = GetFrameTime(); // if less than cap than cap?
+        float dT = GetFrameTime();
         InputSystemResult input = inputSystem.update();
-        atPhysics::applyInputToRigidBody(player, input);
-        atPhysics::updatePhysics(player, levelData.horizontalPlatforms_lwp, dT);
 
-        renderData.playerRect = atConvert_lwpToRaylib::rectangle(player.rect);
-        if (input.direction)
-            renderData.isPlayerFaceRight = (*input.direction == InputSystemDirection::right);
+        atObject *player = levelData.playerRef.resolve();
+        if (player)
+        {
+            atPhysics::applyInputToRigidBody(*player, input);
+            if (input.direction)
+                player->isFlipX = (*input.direction == InputSystemDirection::right);
+            atCamera::setCameraTarget_lwp(camera, player->getColliderRect().getCenter());
+        }
+
+        atPhysics::updatePhysics(levelData.objectsRigid, levelData.objectsStatic, dT);
 
         BeginDrawing();
 
-        atCamera::setCameraTarget_lwp(camera, player.rect.getCenter());
         BeginMode2D(camera);
-        atRenderLevel::render(renderData, textures);
+        atRenderLevel::render(levelData, textures);
 
         EndMode2D();
 
