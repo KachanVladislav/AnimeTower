@@ -27,6 +27,7 @@ struct atLevelDesigner
     atLevelDesignerOp_Executer opExecuter;
     void initialize()
     {
+        data.screenLayout.loadConfig();
         atLevelDataLoader::loadLevelSourceData(LEVEL_PATH, data.levelData);
     }
 
@@ -42,6 +43,7 @@ int main()
     SetTraceLogLevel(LOG_WARNING); // raylib  logs
 
     InitWindow(atDefaults::screenWidth, atDefaults::screenHeight, "atLevelDesigner");
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(120);
 
     atResourceRender textures;
@@ -55,18 +57,32 @@ int main()
     {
         levelDesigner.processModeChange();
         levelDesigner.currentMode->beforeRender(data, opExecuter);
+        Rectangle vp = data.screenLayout.viewport;
         atObject *player = levelDesigner.data.levelData.playerRef.resolve();
         if (player)
-            cameraZoomPanControl.update(data.camera, player->getColliderRect());
+            cameraZoomPanControl.update(data.camera, player->getColliderRect(), vp);
         else
-            cameraZoomPanControl.update(data.camera, player->getColliderRect());
-
+            cameraZoomPanControl.update(data.camera, {}, vp);
+            
+        data.screenLayout.beforeRender((float)GetScreenWidth(), (float)GetScreenHeight());
         BeginDrawing();
 
+        ClearBackground(RAYWHITE);
+
+        // Рендеринг уровня только в viewport
+
+        BeginScissorMode((int)vp.x, (int)vp.y, (int)vp.width, (int)vp.height);
         BeginMode2D(data.camera);
         atRenderLevel::render(data.levelData, textures);
         levelDesigner.currentMode->render_2D(data);
         EndMode2D();
+        EndScissorMode();
+
+        // Границы панелей
+        DrawRectangleLinesEx(vp, 2.f, DARKGRAY);
+        DrawRectangleLinesEx(data.screenLayout.scene, 2.f, DARKGRAY);
+
+        // Screen-space UI
         levelDesigner.currentMode->render_Screen(data);
 
         lwp::Vector2f mousePos_lwp = getMousePos_lwp(data.camera);
@@ -87,6 +103,7 @@ int main()
     }
 
     textures.unload();
+    levelDesigner.data.screenLayout.saveConfig();
     CloseWindow();
 
     return 0;

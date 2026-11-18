@@ -13,16 +13,10 @@ struct atLevelDesignerSelection
 
     void update(atLevelDesigner_Data &data)
     {
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-            isAreaSelecting = true;
-            areaSelectStart = getMousePos_lwp(data.camera);
-            areaSelectEnd = areaSelectStart;
-        }
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && isAreaSelecting)
-        {
-            areaSelectEnd = getMousePos_lwp(data.camera);
-        }
+        Vector2 screenMousePos = GetMousePosition();
+        bool inViewport = data.screenLayout.isPointInViewport(screenMousePos);
+
+        // Отпускание мыши обрабатываем всегда (даже вне viewport)
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && isAreaSelecting)
         {
             isAreaSelecting = false;
@@ -62,17 +56,33 @@ struct atLevelDesignerSelection
                     }
                 }
             }
+            return;
+        }
+
+        if (!inViewport)
+            return;
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            isAreaSelecting = true;
+            areaSelectStart = getMousePos_lwp(data.camera);
+            areaSelectEnd = areaSelectStart;
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && isAreaSelecting)
+        {
+            areaSelectEnd = getMousePos_lwp(data.camera);
         }
         if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
         {
             selectedPlatformIds.clear();
         }
-
-
     }
 
     void render(atLevelDesigner_Data &data)
     {
+        Rectangle vp = data.screenLayout.viewport;
+        BeginScissorMode((int)vp.x, (int)vp.y, (int)vp.width, (int)vp.height);
+
         for (uint32_t id : selectedPlatformIds)
         {
             for (const auto &obj : data.levelData.objectsStatic)
@@ -92,6 +102,8 @@ struct atLevelDesignerSelection
             Rectangle selectRect_raylib = atConvert_lwpToRaylib::rectangle(selectRect_lwp);
             DrawRectangleLinesEx(selectRect_raylib, 0.05f, BLUE);
         }
+
+        EndScissorMode();
     }
 
     void clear()

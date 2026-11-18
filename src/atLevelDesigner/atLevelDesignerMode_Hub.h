@@ -1,16 +1,20 @@
 #pragma once
 #include "atLevelDesignerMode_Interface.h"
 #include "atLevelDesignerSelection.h"
+#include "../hud/WidgetObjectInspector.h"
 
 struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
 {
     static inline const char *LEVEL_PATH_TO_SAVE = "./resource/levels/levelFromDesigner.txt";
     atLevelDesignerSelection selection;
+    WidgetObjectInspector objectInspector;
+    bool inspectorInitialized = false;
 
     void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter) override
     {
+        data.screenLayout.update((float)GetScreenWidth(), (float)GetScreenHeight());
         selection.update(data);
-        if (IsKeyPressed(KEY_D))
+        if (IsKeyPressed(KEY_DELETE))
         {
             deleteSelected(data, opExecuter);
         }
@@ -30,11 +34,19 @@ struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
         }
         if (!selection.selectedPlatformIds.empty())
         {
-            std::string text = std::format("selected: {} platform(s) | D - delete", selection.selectedPlatformIds.size());
+            std::string text = std::format("selected: {} platform(s) | Delete - delete", selection.selectedPlatformIds.size());
             StatusBar_renderText(text.c_str());
         }
         else
             StatusBar_renderText("designer | B - build, F1 - play");
+
+        if (!inspectorInitialized)
+        {
+            Font font = LoadFontEx("./resource/GoogleSans-VariableFont_GRAD,opsz,wght.ttf", 64, NULL, 0);
+            objectInspector.settings = WidgetObjectInspectorSettings::buildDefault(font);
+            inspectorInitialized = true;
+        }
+        objectInspector.draw(selection.selectedPlatformIds, data.levelData.objectsStatic, data.screenLayout.inspector);
     }
     void onStart(atLevelDesigner_Data &) override
     {
