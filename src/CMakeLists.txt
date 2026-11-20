@@ -79,4 +79,5 @@ set(LEVEL_DESIGNER_SOURCES
     atRaygui.cpp
 )
 add_game_executable(atLevelDesigner ${LEVEL_DESIGNER_SOURCES})
+add_compile_definitions(RAYGUI_VALUEBOX_MAX_CHARS=32)
 target_include_directories(atLevelDesigner PRIVATE ../3rdParty/raygui/src)

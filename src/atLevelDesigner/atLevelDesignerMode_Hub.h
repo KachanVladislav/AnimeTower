@@ -1,20 +1,20 @@
 #pragma once
 #include "atLevelDesignerMode_Interface.h"
 #include "atLevelDesignerSelection.h"
-#include "../hud/WidgetObjectInspector.h"
+#include "../hud/atWidgetObjectInspector.h"
 
 struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
 {
     static inline const char *LEVEL_PATH_TO_SAVE = "./resource/levels/levelFromDesigner.txt";
     atLevelDesignerSelection selection;
-    WidgetObjectInspector objectInspector;
+    atWidgetObjectInspector objectInspector;
     bool inspectorInitialized = false;
 
     void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter) override
     {
         data.screenLayout.update((float)GetScreenWidth(), (float)GetScreenHeight());
         selection.update(data);
-        if (IsKeyPressed(KEY_DELETE))
+        if (IsKeyPressed(KEY_D))
         {
             deleteSelected(data, opExecuter);
         }
@@ -32,9 +32,9 @@ struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
         {
             atLevelDataLoader::saveLevelSourceData(LEVEL_PATH_TO_SAVE, data.levelData); // should not be here
         }
-        if (!selection.selectedPlatformIds.empty())
+        if (!selection.selectedObjectsRef.empty())
         {
-            std::string text = std::format("selected: {} platform(s) | Delete - delete", selection.selectedPlatformIds.size());
+            std::string text = std::format("selected: {} platform(s) | D - delete", selection.selectedObjectsRef.size());
             StatusBar_renderText(text.c_str());
         }
         else
@@ -43,10 +43,10 @@ struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
         if (!inspectorInitialized)
         {
             Font font = LoadFontEx("./resource/GoogleSans-VariableFont_GRAD,opsz,wght.ttf", 64, NULL, 0);
-            objectInspector.settings = WidgetObjectInspectorSettings::buildDefault(font);
+            objectInspector.theme = atWidgetTheme::buildDefault(font);
             inspectorInitialized = true;
         }
-        objectInspector.draw(selection.selectedPlatformIds, data.levelData.objectsStatic, data.screenLayout.inspector);
+        objectInspector.draw(selection.selectedObjectsRef, data.screenLayout.inspector);
     }
     void onStart(atLevelDesigner_Data &) override
     {
@@ -59,22 +59,10 @@ struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
 private:
     void deleteSelected(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter)
     {
-        if (selection.selectedPlatformIds.empty())
+        if (selection.selectedObjectsRef.empty())
             return;
-        std::vector<atObject> platforms;
-        std::vector<uint32_t> ids = selection.selectedPlatformIds;
-        for (uint32_t id : ids)
-        {
-            for (const auto &obj : data.levelData.objectsStatic)
-            {
-                if (obj.id == id)
-                {
-                    platforms.push_back(obj);
-                    break;
-                }
-            }
-        }
-        auto op = std::make_unique<atLevelDesignerOp_DeletePlatforms>(std::move(platforms), std::move(ids));
+
+        auto op = std::make_unique<atLevelDesignerOp_DeleteObjects>(selection.selectedObjectsRef);
         opExecuter.execute(std::move(op), data);
         selection.clear();
     }

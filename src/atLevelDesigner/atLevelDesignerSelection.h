@@ -6,7 +6,7 @@
 
 struct atLevelDesignerSelection
 {
-    std::vector<uint32_t> selectedPlatformIds;
+    std::vector<atObjectRefToVector> selectedObjectsRef;
     bool isAreaSelecting = false;
     lwp::Vector2f areaSelectStart;
     lwp::Vector2f areaSelectEnd;
@@ -23,7 +23,7 @@ struct atLevelDesignerSelection
             lwp::Rectangle selectRect = buildRectangleByPos_lwp(areaSelectStart, areaSelectEnd);
             if (selectRect.width < 0.01f && selectRect.height < 0.01f)
             {
-                selectedPlatformIds.clear();
+                selectedObjectsRef.clear();
                 for (size_t i = 0; i < data.levelData.objectsStatic.size(); ++i)
                 {
                     const auto &obj = data.levelData.objectsStatic[i];
@@ -32,7 +32,7 @@ struct atLevelDesignerSelection
                     if (mousePos.x >= rect.x && mousePos.x <= rect.x + rect.width &&
                         mousePos.y >= rect.y && mousePos.y <= rect.y + rect.height)
                     {
-                        selectedPlatformIds.push_back(obj.id);
+                        selectedObjectsRef.push_back(atObjectRefToVector::build(obj.id, &data.levelData.objectsStatic));
                         Console::log("selected platform [id={}]: x={} y={} w={} h={}\n",
                                      obj.id, rect.x, rect.y, rect.width, rect.height);
                         break;
@@ -41,7 +41,7 @@ struct atLevelDesignerSelection
             }
             else
             {
-                selectedPlatformIds.clear();
+                selectedObjectsRef.clear();
                 Console::log("area selected:\n");
                 for (size_t i = 0; i < data.levelData.objectsStatic.size(); ++i)
                 {
@@ -50,7 +50,8 @@ struct atLevelDesignerSelection
                     if (rect.x + rect.width >= selectRect.x && rect.x <= selectRect.x + selectRect.width &&
                         rect.y + rect.height >= selectRect.y && rect.y <= selectRect.y + selectRect.height)
                     {
-                        selectedPlatformIds.push_back(obj.id);
+                        // selectedPlatformIds.push_back(obj.id);
+                        selectedObjectsRef.push_back(atObjectRefToVector::build(obj.id, &data.levelData.objectsStatic));
                         Console::log("  platform [id={}]: x={} y={} w={} h={}\n",
                                      obj.id, rect.x, rect.y, rect.width, rect.height);
                     }
@@ -74,7 +75,7 @@ struct atLevelDesignerSelection
         }
         if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
         {
-            selectedPlatformIds.clear();
+            selectedObjectsRef.clear();
         }
     }
 
@@ -83,19 +84,17 @@ struct atLevelDesignerSelection
         Rectangle vp = data.screenLayout.viewport;
         BeginScissorMode((int)vp.x, (int)vp.y, (int)vp.width, (int)vp.height);
 
-        for (uint32_t id : selectedPlatformIds)
+        for (auto &objRef : selectedObjectsRef)
         {
-            for (const auto &obj : data.levelData.objectsStatic)
+            atObject *obj = objRef.resolve();
+            if (obj)
             {
-                if (obj.id == id)
-                {
-                    const lwp::Rectangle &rect_lwp = obj.getColliderRect();
-                    Rectangle rect_raylib = atConvert_lwpToRaylib::rectangle(rect_lwp);
-                    DrawRectangleLinesEx(rect_raylib, 0.1f, GREEN);
-                    break;
-                }
+                const lwp::Rectangle &rect_lwp = obj->getColliderRect();
+                Rectangle rect_raylib = atConvert_lwpToRaylib::rectangle(rect_lwp);
+                DrawRectangleLinesEx(rect_raylib, 0.1f, GREEN);
             }
         }
+
         if (isAreaSelecting)
         {
             lwp::Rectangle selectRect_lwp = buildRectangleByPos_lwp(areaSelectStart, areaSelectEnd);
@@ -108,6 +107,6 @@ struct atLevelDesignerSelection
 
     void clear()
     {
-        selectedPlatformIds.clear();
+        selectedObjectsRef.clear();
     }
 };

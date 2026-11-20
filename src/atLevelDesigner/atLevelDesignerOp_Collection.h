@@ -14,51 +14,58 @@ struct atLevelDesignerOp_Interface
     virtual const char *getTypeName() const = 0;
 };
 
-struct atLevelDesignerOp_DeletePlatforms : public atLevelDesignerOp_Interface
+struct atLevelDesignerOp_DeleteObjects : public atLevelDesignerOp_Interface
 {
-    std::vector<atObject> platforms;
-    std::vector<uint32_t> originalIds;
+    std::vector<std::pair<atObjectRefToVector, atObject>> objectsCollection;
 
-    atLevelDesignerOp_DeletePlatforms(std::vector<atObject> rects, std::vector<uint32_t> ids)
-        : platforms(std::move(rects)), originalIds(std::move(ids))
+    atLevelDesignerOp_DeleteObjects(std::vector<atObjectRefToVector> &objectsRefs)
     {
+        objectsCollection.reserve(objectsRefs.size());
+        for (auto &objRef : objectsRefs)
+        {
+            atObject *obj = objRef.resolve();
+            if (obj)
+            {
+                objectsCollection.push_back({objRef, *obj});
+            }
+        }
     }
 
-    void apply(atLevelDesigner_Data &data) override
+    void apply(atLevelDesigner_Data &) override
     {
-        for (uint32_t id : originalIds)
+        for (auto &objPair : objectsCollection)
         {
-            for (auto it = data.levelData.objectsStatic.begin(); it != data.levelData.objectsStatic.end(); ++it)
+            auto &vec = *objPair.first.vec_ptr;
+            uint32_t id = objPair.first.id;
+            for (auto it = vec.begin(); it != vec.end(); ++it)
             {
                 if (it->id == id)
                 {
-                    data.levelData.objectsStatic.erase(it);
+                    vec.erase(it);
                     break;
                 }
             }
         }
     }
 
-    void undo(atLevelDesigner_Data &data) override
+    void undo(atLevelDesigner_Data &) override
     {
-        originalIds.clear();
-        for (atObject obj : platforms)
+        for (auto &objPair : objectsCollection)
         {
-            data.levelData.objectBuilder.setUniqueId(obj);
-            originalIds.push_back(obj.id);
-            data.levelData.objectsStatic.push_back(obj);
+            auto &vec = *objPair.first.vec_ptr;
+            vec.push_back(objPair.second);
         }
     }
 
     const char *getTypeName() const override { return "DeletePlatforms"; }
 };
 
-struct atLevelDesignerOp_CreatePlatform : public atLevelDesignerOp_Interface
+struct atLevelDesignerOp_CreateObject : public atLevelDesignerOp_Interface
 {
     atObject platform;
     uint32_t createdId = 0;
 
-    atLevelDesignerOp_CreatePlatform(atObject rect)
+    atLevelDesignerOp_CreateObject(atObject rect)
         : platform(rect)
     {
     }
