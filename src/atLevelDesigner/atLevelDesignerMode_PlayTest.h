@@ -14,11 +14,28 @@ struct atLevelDesignerMode_PlayTest : public atLevelDesignerModeInterface
         if(!player)
             return;
         
+        int layerInc = 0; //prototyping layers change
+        if(input.action == InputSystemAction::layerNext)
+            layerInc = 1;
+        else if(input.action == InputSystemAction::layerPrev)
+            layerInc = -1;
+        if(layerInc != 0) 
+        {
+            int resultNum = (int)data.levelData.currentLayerNum + layerInc;
+            if(resultNum >=0 && resultNum < data.levelData.layers.size())
+            {
+                data.levelData.currentLayerNum = resultNum;
+                atObjectLayers_moveObjectToLayer(data.levelData.playerRef, resultNum);
+            }
+        }
+
         float dT = GetFrameTime();
         atPhysics::applyInputToRigidBody(*player, input);
-        atPhysics::updatePhysics(data.levelData.objectsRigid, data.levelData.objectsStatic, dT);
         if (input.direction)
             player->isFlipX = (*input.direction == InputSystemDirection::right);
+
+        for(auto& layer : data.levelData.layers)
+            atPhysics::updatePhysics(layer.colRigid.vec, layer.colStatic.vec, dT);
     }
     void afterRender(atLevelDesigner_Data &, atLevelDesignerOp_Executer &) override
     {

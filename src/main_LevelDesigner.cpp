@@ -42,7 +42,7 @@ int main()
     levelDesigner.initialize();
     SetTraceLogLevel(LOG_WARNING); // raylib  logs
 
-    InitWindow(atDefaults::screenWidth, atDefaults::screenHeight, "atLevelDesigner");
+    InitWindow(levelDesigner.data.screenLayout.windowSize_x, levelDesigner.data.screenLayout.windowSize_y, "atLevelDesigner");
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(120);
 
@@ -103,6 +103,8 @@ int main()
     }
 
     textures.unload();
+    levelDesigner.data.screenLayout.windowSize_x = GetScreenWidth();
+    levelDesigner.data.screenLayout.windowSize_y = GetScreenHeight();
     levelDesigner.data.screenLayout.saveConfig();
     CloseWindow();
 

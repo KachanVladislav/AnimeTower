@@ -23,32 +23,41 @@ static inline void drawTexture_sameHigh(const Rectangle &rect, const Texture2D &
 
 struct atRenderLevel
 {
-    static void render(const atLevelData &data, const atResourceRender &textures)
+    static void render(atLevelData &data, const atResourceRender &textures)
     {
         ClearBackground(LIGHTGRAY);
 
-        for (const auto &obj : data.objectsStatic)
+        int offsetCount = -(int)data.currentLayerNum;
+        Vector2 offsetBase{5.f, -5.f};
+        for (auto &layer : data.layers)
         {
-            Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
-            auto rect = Rectangle{pos_raylib.x, pos_raylib.y, obj.collider.size.x, obj.collider.size.y};
-            atRenderPlatform::draw(textures.platformAtlas, rect);
-            DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
-        }
+            Vector2 offset{offsetBase.x * offsetCount, offsetBase.y * offsetCount};
+            offsetCount++;
+            for (const auto &obj : layer.colStatic.vec)
+            {
+                Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
+                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, obj.collider.size.x, obj.collider.size.y};
+                atRenderPlatform::draw(textures.platformAtlas, rect);
+                DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
+                DrawLineEx({rect.x, rect.y}, {pos_raylib.x, pos_raylib.y}, 0.1f, BLACK);
+                DrawLineEx({rect.x + rect.width, rect.y}, {pos_raylib.x + rect.width, pos_raylib.y}, 0.1f, BLACK);
+            }
 
-        for (const auto &obj : data.objectsRigid)
-        {
-            Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
-            auto rect = Rectangle{pos_raylib.x, pos_raylib.y, obj.collider.size.x, obj.collider.size.y};
-            drawTexture_sameHigh(rect, textures.playerTexture, obj.isFlipX);
-            DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
-        }
+            for (const auto &obj : layer.colRigid.vec)
+            {
+                Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
+                auto rect = Rectangle{pos_raylib.x + +offset.x, pos_raylib.y + +offset.y, obj.collider.size.x, obj.collider.size.y};
+                drawTexture_sameHigh(rect, textures.playerTexture, obj.isFlipX);
+                DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
+            }
 
-        for (const auto &obj : data.objectsNotCollidable)
-        {
-            Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
-            auto rect = Rectangle{pos_raylib.x, pos_raylib.y, obj.collider.size.x, obj.collider.size.y};
-            atObjectRender::drawAnimated(textures.flagPolAtlas, (float)GetTime(), 0.15f, rect);
-            DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
+            for (const auto &obj : layer.colNotCollidable.vec)
+            {
+                Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getPos_UpLeft());
+                auto rect = Rectangle{pos_raylib.x + +offset.x, pos_raylib.y + +offset.y, obj.collider.size.x, obj.collider.size.y};
+                atObjectRender::drawAnimated(textures.flagPolAtlas, (float)GetTime(), 0.15f, rect);
+                DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
+            }
         }
     }
 };

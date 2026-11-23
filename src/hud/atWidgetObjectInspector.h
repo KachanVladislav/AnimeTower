@@ -2,31 +2,8 @@
 #include "raylib.h"
 #include "raygui.h"
 #include "../atLevel/atObject.h"
+#include "atStringTemplate.h"
 #include <vector>
-#include <cstring>
-#include <cstdint>
-
-template <size_t CAPACITY>
-struct atStringTemplate
-{
-    char data[CAPACITY]{};
-    size_t capacity() const { return CAPACITY; }
-
-    constexpr atStringTemplate() = default;
-    void fromFloat(float value)
-    {
-        int len = snprintf(data, CAPACITY, "%.2f", value);
-        std::memset(&data[len], 0, CAPACITY - len);
-    }
-    void clear()
-    {
-        std::memset(&data[0], 0, CAPACITY);
-    }
-    bool length()
-    {
-        return strnlen_s(data, CAPACITY);
-    }
-};
 
 struct atWidgetSpacing
 {
@@ -106,6 +83,18 @@ struct atWidgetEditFloat
     }
 };
 
+struct atWidgetDropDownBox
+{
+    atStringTemplate<32> text;
+    int active = 0;
+    bool editMode = false;
+    void draw(Rectangle area)
+    {
+        if (GuiDropdownBox(area, text.data, &active, editMode) != RESULT_NONE)
+            editMode = !editMode;
+    }
+};
+
 struct atWidgetObjectProperties
 {
     atWidgetEditFloat widgetEditX;
@@ -114,8 +103,31 @@ struct atWidgetObjectProperties
     atWidgetEditFloat widgetEditColliderOffsetY;
     atWidgetEditFloat widgetEditColliderSizeX;
     atWidgetEditFloat widgetEditColliderSizeY;
-    void draw(atObject &obj, const Rectangle &areaFull, atWidgetTheme &theme)
+    atWidgetDropDownBox widgetDropdownBoxCollection;
+    atWidgetDropDownBox widgetDropdownBoxLayer;
+    uint32_t objId = 0;
+    bool isFirstObject = true;
+    void updateDataForNewObject(atObjectRef &objRef)
     {
+        atObject *obj = objRef.resolve();
+        if (isFirstObject || objId != obj->id)
+        {
+            isFirstObject = false;
+            objId = obj->id;
+            widgetDropdownBoxCollection.active = (int)objRef.collectionIndex;
+            widgetDropdownBoxLayer.active = (int)objRef.layerIndex;
+        }
+    }
+
+    void draw(atObjectRef &objRef, const Rectangle &areaFull, atWidgetTheme &theme)
+    {
+        atObject *objPointer = objRef.resolve();
+        atObjectsCollection *objCollection = objRef.resolveCollection();
+        if (!objPointer || !objCollection)
+            return;
+        updateDataForNewObject(objRef);
+        atObject &obj = *objPointer;
+
         const int textSizeBefore = GuiGetStyle(DEFAULT, TEXT_SIZE);
         GuiSetStyle(DEFAULT, TEXT_SIZE, theme.fontSize);
 
@@ -152,7 +164,6 @@ struct atWidgetObjectProperties
         areaForNextElementTryHorizontal();
         widgetEditY.draw(areaForEdit, "y", &obj.transform.pos.y);
 
-        
         drawTextNewLine("Collider offset:");
         areaForNextElementVertical();
         widgetEditColliderOffsetX.draw(areaForEdit, "x", &obj.collider.offset.x);
@@ -165,6 +176,38 @@ struct atWidgetObjectProperties
         areaForNextElementTryHorizontal();
         widgetEditColliderSizeY.draw(areaForEdit, "y", &obj.collider.size.y);
 
+        if (widgetDropdownBoxCollection.text.length() == 0)
+        {
+            atObjectsCollectionLayer *layer = objRef.resolveLayer();
+            if (layer)
+            {
+                for (auto &collection : layer->collections())
+                {
+                    widgetDropdownBoxCollection.text.append(collection->tag.data);
+                    widgetDropdownBoxCollection.text.append(";");
+                }
+                widgetDropdownBoxCollection.text.data[widgetDropdownBoxCollection.text.length() - 1] = 0;
+            }
+        }
+
+        if (widgetDropdownBoxLayer.text.length() == 0)
+        {
+            for (atObjectsCollectionLayer &layer : *objRef.layers)
+            {
+                widgetDropdownBoxLayer.text.append(layer.tag.data);
+                widgetDropdownBoxLayer.text.append(";");
+            }
+            widgetDropdownBoxLayer.text.data[widgetDropdownBoxLayer.text.length() - 1] = 0;
+        }
+
+        drawTextNewLine("Layer: ");
+        areaForNextElementTryHorizontal();
+        Rectangle areaForEditLayer = areaForEdit;
+        drawTextNewLine("Collection: ");
+        areaForNextElementTryHorizontal();
+        widgetDropdownBoxCollection.draw(areaForEdit);
+        widgetDropdownBoxLayer.draw(areaForEditLayer); // reverse order not to overlay on dropdown
+
         GuiSetStyle(DEFAULT, TEXT_SIZE, textSizeBefore);
     }
 };
@@ -174,7 +217,7 @@ class atWidgetObjectInspector
 public:
     atWidgetObjectProperties widgetTransform;
     atWidgetTheme theme;
-    void draw(std::vector<atObjectRefToVector> &objectsRef, Rectangle panelRect)
+    void draw(std::vector<atObjectRef> &objectsRef, Rectangle panelRect)
     {
         DrawRectangleRec(panelRect, theme.panelColor);
         DrawRectangleLinesEx(panelRect, 1.f, GRAY);
@@ -200,12 +243,24 @@ public:
             return;
         }
 
-        atObject *obj = objectsRef[0].resolve();
-        if (!obj)
-        {
+        atObjectRef &objRef = objectsRef[0];
+
+        if (!objRef.resolve())
             return;
+
+        widgetTransform.draw(objRef, {panelRect.x + theme.gap.x, y, panelRect.width, panelRect.height}, theme);
+        size_t selectedCollectionIndex = (size_t)widgetTransform.widgetDropdownBoxCollection.active;
+        if (selectedCollectionIndex != objRef.collectionIndex)
+        {
+            atObjectLayers_moveObjectToCollection(objRef, selectedCollectionIndex);
+            Console::log("[move collection] from {} to {}\n", objRef.collectionIndex, selectedCollectionIndex);
         }
 
-        widgetTransform.draw(*obj, {panelRect.x + theme.gap.x, y, panelRect.width, panelRect.height}, theme);
+        size_t selectedLayerIndex = (size_t)widgetTransform.widgetDropdownBoxLayer.active;
+        if (selectedLayerIndex != objRef.layerIndex)
+        {
+            Console::log("[move layer] from {} to {}\n", objRef.layerIndex, selectedLayerIndex);
+            atObjectLayers_moveObjectToLayer(objRef, selectedLayerIndex);
+        }
     }
 };

@@ -3,7 +3,6 @@ project(AnimeTower LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # Add raylib as a subdirectory (source in 3rdParty, build in build/raylib)
 add_subdirectory(../3rdParty/raylib ${CMAKE_BINARY_DIR}/raylib)
 

@@ -1,0 +1,5 @@
+playerPos 10.5 20.3
+layer
+static 0
+rigid 0
+notCollidable 0

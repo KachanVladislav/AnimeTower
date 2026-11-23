@@ -1,13 +1,15 @@
 #pragma once
 #include "atLevelDesignerMode_Interface.h"
 #include "atLevelDesignerSelection.h"
-#include "../hud/atWidgetObjectInspector.h"
+#include "hud/atWidgetObjectInspector.h"
+#include "hud/atWidgetLayersOverview.h"
 
 struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
 {
     static inline const char *LEVEL_PATH_TO_SAVE = "./resource/levels/levelFromDesigner.txt";
     atLevelDesignerSelection selection;
-    atWidgetObjectInspector objectInspector;
+    atWidgetObjectInspector widgetObjectInspector;
+    atWidgetLayersOverview widgetLayersOverview;
     bool inspectorInitialized = false;
 
     void beforeRender(atLevelDesigner_Data &data, atLevelDesignerOp_Executer &opExecuter) override
@@ -43,10 +45,12 @@ struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
         if (!inspectorInitialized)
         {
             Font font = LoadFontEx("./resource/GoogleSans-VariableFont_GRAD,opsz,wght.ttf", 64, NULL, 0);
-            objectInspector.theme = atWidgetTheme::buildDefault(font);
+            widgetObjectInspector.theme = atWidgetTheme::buildDefault(font);
+            widgetLayersOverview.theme = atWidgetTheme::buildDefault(font);
             inspectorInitialized = true;
         }
-        objectInspector.draw(selection.selectedObjectsRef, data.screenLayout.inspector);
+        widgetLayersOverview.draw(data.levelData, data.screenLayout.scene);
+        widgetObjectInspector.draw(selection.selectedObjectsRef, data.screenLayout.inspector);
     }
     void onStart(atLevelDesigner_Data &) override
     {

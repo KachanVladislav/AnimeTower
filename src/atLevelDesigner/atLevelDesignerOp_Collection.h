@@ -16,9 +16,9 @@ struct atLevelDesignerOp_Interface
 
 struct atLevelDesignerOp_DeleteObjects : public atLevelDesignerOp_Interface
 {
-    std::vector<std::pair<atObjectRefToVector, atObject>> objectsCollection;
+    std::vector<std::pair<atObjectRef, atObject>> objectsCollection;
 
-    atLevelDesignerOp_DeleteObjects(std::vector<atObjectRefToVector> &objectsRefs)
+    atLevelDesignerOp_DeleteObjects(std::vector<atObjectRef> &objectsRefs)
     {
         objectsCollection.reserve(objectsRefs.size());
         for (auto &objRef : objectsRefs)
@@ -35,14 +35,18 @@ struct atLevelDesignerOp_DeleteObjects : public atLevelDesignerOp_Interface
     {
         for (auto &objPair : objectsCollection)
         {
-            auto &vec = *objPair.first.vec_ptr;
-            uint32_t id = objPair.first.id;
-            for (auto it = vec.begin(); it != vec.end(); ++it)
+            atObjectsCollection *collection = objPair.first.resolveCollection();
+            if (collection)
             {
-                if (it->id == id)
+                auto &vec = collection->vec;
+                uint32_t id = objPair.first.id;
+                for (auto it = vec.begin(); it != vec.end(); ++it)
                 {
-                    vec.erase(it);
-                    break;
+                    if (it->id == id)
+                    {
+                        vec.erase(it);
+                        break;
+                    }
                 }
             }
         }
@@ -52,8 +56,12 @@ struct atLevelDesignerOp_DeleteObjects : public atLevelDesignerOp_Interface
     {
         for (auto &objPair : objectsCollection)
         {
-            auto &vec = *objPair.first.vec_ptr;
-            vec.push_back(objPair.second);
+            atObjectsCollection *collection = objPair.first.resolveCollection();
+            if (collection)
+            {
+                auto &vec = collection->vec;
+                vec.push_back(objPair.second);
+            }
         }
     }
 
@@ -74,16 +82,18 @@ struct atLevelDesignerOp_CreateObject : public atLevelDesignerOp_Interface
     {
         data.levelData.objectBuilder.setUniqueId(platform);
         createdId = platform.id;
-        data.levelData.objectsStatic.push_back(platform);
+        auto &colStatic = data.levelData.currentLayer().colStatic.vec;
+        colStatic.push_back(platform);
     }
 
     void undo(atLevelDesigner_Data &data) override
     {
-        for (auto it = data.levelData.objectsStatic.begin(); it != data.levelData.objectsStatic.end(); ++it)
+        auto &colStatic = data.levelData.currentLayer().colStatic.vec;
+        for (auto it = colStatic.begin(); it != colStatic.end(); ++it)
         {
             if (it->id == createdId)
             {
-                data.levelData.objectsStatic.erase(it);
+                colStatic.erase(it);
                 break;
             }
         }

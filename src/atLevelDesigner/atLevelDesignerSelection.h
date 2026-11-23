@@ -1,12 +1,13 @@
 #pragma once
 #include "atLevelDesignerMode_Interface.h"
 #include "../Console.h"
-#include <algorithm>
-#include <memory>
+
+// #include <algorithm>
+// #include <memory>
 
 struct atLevelDesignerSelection
 {
-    std::vector<atObjectRefToVector> selectedObjectsRef;
+    std::vector<atObjectRef> selectedObjectsRef;
     bool isAreaSelecting = false;
     lwp::Vector2f areaSelectStart;
     lwp::Vector2f areaSelectEnd;
@@ -24,18 +25,23 @@ struct atLevelDesignerSelection
             if (selectRect.width < 0.01f && selectRect.height < 0.01f)
             {
                 selectedObjectsRef.clear();
-                for (size_t i = 0; i < data.levelData.objectsStatic.size(); ++i)
+
+                for (auto &collection : data.levelData.currentLayer().collections())
                 {
-                    const auto &obj = data.levelData.objectsStatic[i];
-                    const lwp::Rectangle &rect = obj.getColliderRect();
-                    lwp::Vector2f mousePos = areaSelectStart;
-                    if (mousePos.x >= rect.x && mousePos.x <= rect.x + rect.width &&
-                        mousePos.y >= rect.y && mousePos.y <= rect.y + rect.height)
+                    std::vector<atObject> &colObj = collection->vec;
+                    for (size_t i = 0; i < colObj.size(); ++i)
                     {
-                        selectedObjectsRef.push_back(atObjectRefToVector::build(obj.id, &data.levelData.objectsStatic));
-                        Console::log("selected platform [id={}]: x={} y={} w={} h={}\n",
-                                     obj.id, rect.x, rect.y, rect.width, rect.height);
-                        break;
+                        const auto &obj = colObj[i];
+                        const lwp::Rectangle &rect = obj.getColliderRect();
+                        lwp::Vector2f mousePos = areaSelectStart;
+                        if (mousePos.x >= rect.x && mousePos.x <= rect.x + rect.width &&
+                            mousePos.y >= rect.y && mousePos.y <= rect.y + rect.height)
+                        {
+                            selectedObjectsRef.push_back(atObjectRef(&data.levelData.layers, obj.id));
+                            Console::log("selected [id={}]: x={} y={} w={} h={}\n",
+                                         obj.id, rect.x, rect.y, rect.width, rect.height);
+                            break;
+                        }
                     }
                 }
             }
@@ -43,17 +49,21 @@ struct atLevelDesignerSelection
             {
                 selectedObjectsRef.clear();
                 Console::log("area selected:\n");
-                for (size_t i = 0; i < data.levelData.objectsStatic.size(); ++i)
+                for (auto &collection : data.levelData.currentLayer().collections())
                 {
-                    const auto &obj = data.levelData.objectsStatic[i];
-                    const lwp::Rectangle &rect = obj.getColliderRect();
-                    if (rect.x + rect.width >= selectRect.x && rect.x <= selectRect.x + selectRect.width &&
-                        rect.y + rect.height >= selectRect.y && rect.y <= selectRect.y + selectRect.height)
+                    std::vector<atObject> &colObj = collection->vec;
+                    for (size_t i = 0; i < colObj.size(); ++i)
                     {
-                        // selectedPlatformIds.push_back(obj.id);
-                        selectedObjectsRef.push_back(atObjectRefToVector::build(obj.id, &data.levelData.objectsStatic));
-                        Console::log("  platform [id={}]: x={} y={} w={} h={}\n",
-                                     obj.id, rect.x, rect.y, rect.width, rect.height);
+                        const auto &obj = colObj[i];
+                        const lwp::Rectangle &rect = obj.getColliderRect();
+                        if (rect.x + rect.width >= selectRect.x && rect.x <= selectRect.x + selectRect.width &&
+                            rect.y + rect.height >= selectRect.y && rect.y <= selectRect.y + selectRect.height)
+                        {
+                            // selectedPlatformIds.push_back(obj.id);
+                            selectedObjectsRef.push_back(atObjectRef(&data.levelData.layers, obj.id));
+                            Console::log("  platform [id={}]: x={} y={} w={} h={}\n",
+                                         obj.id, rect.x, rect.y, rect.width, rect.height);
+                        }
                     }
                 }
             }

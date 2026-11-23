@@ -18,12 +18,17 @@ struct atLevelDesignerScreenLayout
 
     static inline const char *CONFIG_PATH = "./resource/levels/screenLayout.ini";
 
+    int windowSize_x{};//just for a moment here:)
+    int windowSize_y{};
+
     void loadConfig()
     {
         std::ifstream file(CONFIG_PATH);
         if (!file.is_open()) return;
 
         std::string line;
+        windowSize_x = 640;
+        windowSize_y = 480;
         while (std::getline(file, line))
         {
             if (line.empty() || line[0] == '#') continue;
@@ -35,6 +40,8 @@ struct atLevelDesignerScreenLayout
             else if (key == "inspectorWidth") inspectorWidth = value;
             else if (key == "consoleHeight") consoleHeight = value;
             else if (key == "sceneWidth") sceneWidth = value;
+            else if (key == "winSize_x") windowSize_x = (int)value;
+            else if (key == "winSize_y") windowSize_y = (int)value;
         }
     }
 
@@ -47,6 +54,8 @@ struct atLevelDesignerScreenLayout
         file << "inspectorWidth=" << inspectorWidth << "\n";
         file << "consoleHeight=" << consoleHeight << "\n";
         file << "sceneWidth=" << sceneWidth << "\n";
+        file << "winSize_x=" << windowSize_x << "\n";
+        file << "winSize_y=" << windowSize_y << "\n";
     }
 
     // Drag state

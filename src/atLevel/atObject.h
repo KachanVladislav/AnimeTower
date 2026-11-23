@@ -1,5 +1,7 @@
 #pragma once
 #include "lwp/lwp.h"
+#include "atStringTemplate.h"
+#include <array>
 
 struct atTransform
 {
@@ -32,5 +34,30 @@ struct atObject
                 transform.pos.y + collider.offset.y,
                 collider.size.x,
                 collider.size.y};
+    }
+};
+
+struct atObjectsCollection
+{
+    atStringTemplate<32> tag;
+    std::vector<atObject> vec;
+};
+
+struct atObjectsCollectionLayer
+{
+    atStringTemplate<32> tag;
+    atObjectsCollection colStatic;
+    atObjectsCollection colRigid;
+    atObjectsCollection colNotCollidable;
+    std::array<atObjectsCollection *, 3> collections()
+    {
+        return {&colStatic, &colRigid, &colNotCollidable};
+    }
+    atObjectsCollectionLayer()
+    {
+        tag = "layer";
+        colStatic.tag = "static";
+        colRigid.tag = "rigid";
+        colNotCollidable.tag = "notCollidable";
     }
 };

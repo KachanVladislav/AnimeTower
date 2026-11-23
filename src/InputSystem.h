@@ -10,7 +10,9 @@ enum class InputSystemDirection
 
 enum class InputSystemAction
 {
-    jump
+    jump,
+    layerNext,
+    layerPrev
 };
 
 struct InputSystemResult
@@ -28,6 +30,10 @@ public:
 
         if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_SPACE))
             result.action = InputSystemAction::jump;
+        else if (IsKeyPressed(KEY_Q))
+            result.action = InputSystemAction::layerPrev;
+        else if (IsKeyPressed(KEY_E))
+            result.action = InputSystemAction::layerNext;
 
         bool keyLeft = IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT);
         bool keyRight = IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT);
