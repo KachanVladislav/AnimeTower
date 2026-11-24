@@ -1,16 +1,16 @@
 playerPos 0 0
 layer main 
 static 2
-obj -1 0 5 1
-obj 13.4242 0 4.50175 1
+obj -1 0 5 1 0 0 5 1
+obj 13.4242 0 4.50175 1 0 0 4.5 1
 rigid 1
-obj 1.4611 1 1 2
+obj 16.4063 1 1 2 0 0 1 2
 notCollidable 1
-obj 16.5627 1 1 2
+obj 16.5627 1 1 2 0 0 1 2
 layer second 
 static 2
-obj -1 0 5 1
-obj 5 0 9.94138 1
+obj -1 0 5 1 0 0 5 1
+obj 5 0 9.94138 1 0 0 9.94 1
 rigid 0
 notCollidable 0
 ref player 0 1 0

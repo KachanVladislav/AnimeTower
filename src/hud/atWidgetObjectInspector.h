@@ -103,6 +103,12 @@ struct atWidgetObjectProperties
     atWidgetEditFloat widgetEditColliderOffsetY;
     atWidgetEditFloat widgetEditColliderSizeX;
     atWidgetEditFloat widgetEditColliderSizeY;
+
+    atWidgetEditFloat widgetEditTextureOffsetX;
+    atWidgetEditFloat widgetEditTextureOffsetY;
+    atWidgetEditFloat widgetEditTextureSizeX;
+    atWidgetEditFloat widgetEditTextureSizeY;
+
     atWidgetDropDownBox widgetDropdownBoxCollection;
     atWidgetDropDownBox widgetDropdownBoxLayer;
     uint32_t objId = 0;
@@ -158,23 +164,20 @@ struct atWidgetObjectProperties
             DrawText(text, (int)areaForEdit.x, (int)areaForEdit.y, theme.fontSize, theme.textColor);
         };
 
-        DrawText("Transform:", (int)areaForEdit.x, (int)area.y, theme.fontSize, theme.textColor);
-        areaForNextElementVertical();
-        widgetEditX.draw(areaForEdit, "x", &obj.transform.pos.x);
-        areaForNextElementTryHorizontal();
-        widgetEditY.draw(areaForEdit, "y", &obj.transform.pos.y);
+        auto drawVector2f = [&](const char *text, atWidgetEditFloat &editX, atWidgetEditFloat &editY, lwp::Vector2f& vec)
+        {
+            drawTextNewLine(text);
+            areaForNextElementVertical();
+            editX.draw(areaForEdit, "x", &vec.x);
+            areaForNextElementTryHorizontal();
+            editY.draw(areaForEdit, "x", &vec.y);
+        };
 
-        drawTextNewLine("Collider offset:");
-        areaForNextElementVertical();
-        widgetEditColliderOffsetX.draw(areaForEdit, "x", &obj.collider.offset.x);
-        areaForNextElementTryHorizontal();
-        widgetEditColliderOffsetY.draw(areaForEdit, "x", &obj.collider.offset.y);
-
-        drawTextNewLine("Collider Size:");
-        areaForNextElementVertical();
-        widgetEditColliderSizeX.draw(areaForEdit, "x", &obj.collider.size.x);
-        areaForNextElementTryHorizontal();
-        widgetEditColliderSizeY.draw(areaForEdit, "y", &obj.collider.size.y);
+        drawVector2f("Transform:", widgetEditX, widgetEditY, obj.transform.pos);
+        drawVector2f("Collider offset:", widgetEditColliderOffsetX, widgetEditColliderOffsetY, obj.collider.offset);
+        drawVector2f("Collider Size:", widgetEditColliderOffsetX, widgetEditColliderOffsetY, obj.collider.size);
+        drawVector2f("Texture offset:", widgetEditTextureOffsetX, widgetEditTextureOffsetY, obj.animationData.offset);
+        drawVector2f("Texture Size:", widgetEditTextureSizeX, widgetEditTextureSizeY, obj.animationData.size);
 
         if (widgetDropdownBoxCollection.text.length() == 0)
         {

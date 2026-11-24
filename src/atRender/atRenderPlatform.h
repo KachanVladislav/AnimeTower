@@ -8,6 +8,8 @@ struct atRenderPlatform
     static void draw(const atResourcePlatformAtlas &atlas, const Rectangle &destRect)
     {
         const float ratio_toDest = destRect.height / atlas.recLeft.height;
+        if(ratio_toDest < 1e-5)//TODO reevalute
+            return;
 
         const float widthDestLeft = atlas.recLeft.width * ratio_toDest;
         const float widthDestMid = atlas.recMid.width * ratio_toDest;

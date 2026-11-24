@@ -93,6 +93,11 @@ struct atLevelDataLoader
                     collection->vec.push_back(builder.fromColliderRect(rect));
                 else
                     Console::log("[FAIL] read obj collection");
+                in >> rect.x >> rect.y >> rect.width >> rect.height;
+                collection->vec.back().animationData.offset.x = rect.x;
+                collection->vec.back().animationData.offset.y = rect.y;
+                collection->vec.back().animationData.size.x = rect.width;
+                collection->vec.back().animationData.size.y = rect.height;
             }
             if (!(in >> token))
                 return "";
@@ -177,7 +182,9 @@ private:
         for (const auto &obj : collection->vec)
         {
             const auto &rect = obj.getColliderRect();
-            out << TOKEN_OBJECT << " " << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << "\n";
+            out << TOKEN_OBJECT << " " << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << " ";
+            out << obj.animationData.offset.x << " " << obj.animationData.offset.y << " ";
+            out << obj.animationData.size.x << " " << obj.animationData.size.y << "\n";
         }
     }
 };
