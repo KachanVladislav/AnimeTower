@@ -1,6 +1,6 @@
 #pragma once
 #include "atLevelDesignerMode_Interface.h"
-#include "../atLevel/atLevelData.h"
+#include "atLevel/atLevelData.h"
 #include "../atRender/atRenderLevel.h"
 #include "../atConvert_lwpToRaylib.h"
 #include <algorithm>

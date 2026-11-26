@@ -1,0 +1,24 @@
+layers_1.0 2
+main
+static 2
+-1 0 0 0 5 1 13.4242 0 0 0 4.50175 1 rigid 1
+1.58791 1 0 0 1 2 notCollidable 1
+16.5627 1 0 0 1 2 second
+static 2
+-1 0 0 0 5 1 5 0 0 0 9.94138 1 rigid 0
+notCollidable 0
+refs 1
+player 0 1 0
+layers_1.0 2
+sprites 1
+0 1 0
+0 0 1 2 platforms 2
+0 0 0
+0 0 5 1 0 0 1
+0 0 4.50175 1 animated 1
+0 2 0
+0 0 1 2 sprites 0
+platforms 2
+1 0 1
+0 0 9.94138 1 1 0 0
+0 0 5 1 animated 0

@@ -20,12 +20,6 @@ struct atRigidBody2D
     bool isOnFloor = false;
 };
 
-struct atAnimationData
-{
-    lwp::Vector2f offset{};
-    lwp::Vector2f size{};
-};
-
 struct atObject
 {
     uint32_t id = 0;
@@ -33,13 +27,7 @@ struct atObject
     atColliderRect collider;
     atRigidBody2D rigidBody;
     bool isFlipX = false;
-    atAnimationData animationData;
     lwp::Vector2f getPos_UpLeft() const { return {transform.pos.x, transform.pos.y + collider.size.y}; }
-    lwp::Vector2f getTextureWorldPos_UpLeft() const
-    {
-        return {transform.pos.x + animationData.offset.x,
-                transform.pos.y + animationData.offset.y + animationData.size.y};
-    }
     lwp::Rectangle getColliderRect() const
     {
         return {transform.pos.x + collider.offset.x,
@@ -61,6 +49,7 @@ struct atObjectsCollectionLayer
     atObjectsCollection colStatic;
     atObjectsCollection colRigid;
     atObjectsCollection colNotCollidable;
+
     std::array<atObjectsCollection *, 3> collections()
     {
         return {&colStatic, &colRigid, &colNotCollidable};

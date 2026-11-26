@@ -29,33 +29,68 @@ struct atRenderLevel
 
         int offsetCount = -(int)data.currentLayerNum;
         Vector2 offsetBase{5.f, -5.f};
+
+        //draw render data
+        for (auto &renderData : data.layersRenderData)
+        {
+            Vector2 offset{offsetBase.x * offsetCount, offsetBase.y * offsetCount};
+            offsetCount++;
+            for (auto &sprite : renderData.sprites.vec)
+            {
+                lwp::Vector2f pos = sprite.objRef.resolve()->transform.pos;
+                Vector2 pos_raylib{pos.x + sprite.offset.x, -pos.y - sprite.offset.y - sprite.size.y};
+                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, sprite.size.x, sprite.size.y};
+                drawTexture_sameHigh(rect, textures.playerTexture, sprite.isFlipX);
+            }
+            for (auto &sprite : renderData.platforms.vec)
+            {
+                lwp::Vector2f pos = sprite.objRef.resolve()->transform.pos;
+                Vector2 pos_raylib{pos.x + sprite.offset.x, -pos.y - sprite.offset.y - sprite.size.y};
+                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, sprite.size.x, sprite.size.y};
+                atRenderPlatform::draw(textures.platformAtlas, rect);
+            }
+            for (auto &sprite : renderData.animated.vec)
+            {
+                lwp::Vector2f pos = sprite.objRef.resolve()->transform.pos;
+                Vector2 pos_raylib{pos.x + sprite.offset.x, -pos.y - sprite.offset.y - sprite.size.y};
+                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, sprite.size.x, sprite.size.y};
+                atObjectRender::drawAnimated(textures.flagPolAtlas, (float)GetTime(), 0.15f, rect);
+            }
+        }
+
+        //draw colliders
+        offsetCount = -(int)data.currentLayerNum;
         for (auto &layer : data.layers)
         {
             Vector2 offset{offsetBase.x * offsetCount, offsetBase.y * offsetCount};
             offsetCount++;
             for (const auto &obj : layer.colStatic.vec)
             {
-                Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getTextureWorldPos_UpLeft());
-                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, obj.animationData.size.x, obj.animationData.size.y};
-                atRenderPlatform::draw(textures.platformAtlas, rect);
+                lwp::Vector2f pos = obj.transform.pos;
+                atColliderRect collider = obj.collider;
+                Vector2 pos_raylib{pos.x + collider.offset.x, -pos.y - collider.offset.y - collider.size.y};
+                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, collider.size.x, collider.size.y};
+                DrawRectangleLinesEx(rect, 0.05f, BLUE);
                 DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
-                DrawLineEx({rect.x, rect.y}, {pos_raylib.x, pos_raylib.y}, 0.1f, BLACK);
-                DrawLineEx({rect.x + rect.width, rect.y}, {pos_raylib.x + rect.width, pos_raylib.y}, 0.1f, BLACK);
             }
 
             for (const auto &obj : layer.colRigid.vec)
             {
-                Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getTextureWorldPos_UpLeft());
-                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, obj.animationData.size.x, obj.animationData.size.y};
-                drawTexture_sameHigh(rect, textures.playerTexture, obj.isFlipX);
+                lwp::Vector2f pos = obj.transform.pos;
+                atColliderRect collider = obj.collider;
+                Vector2 pos_raylib{pos.x + collider.offset.x, -pos.y - collider.offset.y - collider.size.y};
+                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, collider.size.x, collider.size.y};
+                DrawRectangleLinesEx(rect, 0.05f, GREEN);
                 DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
             }
 
             for (const auto &obj : layer.colNotCollidable.vec)
             {
-                Vector2 pos_raylib = atConvert_lwpToRaylib::position(obj.getTextureWorldPos_UpLeft());
-                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, obj.animationData.size.x, obj.animationData.size.y};
-                atObjectRender::drawAnimated(textures.flagPolAtlas, (float)GetTime(), 0.15f, rect);
+                lwp::Vector2f pos = obj.transform.pos;
+                atColliderRect collider = obj.collider;
+                Vector2 pos_raylib{pos.x + collider.offset.x, -pos.y - collider.offset.y - collider.size.y};
+                auto rect = Rectangle{pos_raylib.x + offset.x, pos_raylib.y + offset.y, collider.size.x, collider.size.y};
+                DrawRectangleLinesEx(rect, 0.05f, YELLOW);
                 DrawCircleV({rect.x, rect.y}, 0.05f, BLACK);
             }
         }

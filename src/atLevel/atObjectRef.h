@@ -33,20 +33,16 @@ struct atObjectRef
 
     atObjectsCollectionLayer* resolveLayer()
     {
-        if (layerIndex < layers->size())
-            return &layers->at(layerIndex);
-        return nullptr;
+        if(resolve() == nullptr)
+            return nullptr;
+        return &layers->at(layerIndex);
     }
 
     atObjectsCollection *resolveCollection()
     {
-        if (layerIndex < layers->size())
-        {
-            atObjectsCollectionLayer &layer = layers->at(layerIndex);
-            if (collectionIndex < layer.collections().size())
-                return layer.collections()[collectionIndex];
-        }
-        return nullptr;
+        if(resolve() == nullptr)
+            return nullptr;
+        return layers->at(layerIndex).collections()[collectionIndex];
     }
 
     atObject *resolve()

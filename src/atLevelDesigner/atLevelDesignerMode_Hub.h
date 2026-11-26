@@ -50,7 +50,7 @@ struct atLevelDesignerMode_Hub : public atLevelDesignerModeInterface
             inspectorInitialized = true;
         }
         widgetLayersOverview.draw(data.levelData, data.screenLayout.scene);
-        widgetObjectInspector.draw(selection.selectedObjectsRef, data.screenLayout.inspector);
+        widgetObjectInspector.draw(selection.selectedObjectsRef, data.screenLayout.inspector, data.levelData);
     }
     void onStart(atLevelDesigner_Data &) override
     {

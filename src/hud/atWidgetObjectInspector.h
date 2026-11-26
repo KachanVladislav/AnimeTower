@@ -111,9 +111,13 @@ struct atWidgetObjectProperties
 
     atWidgetDropDownBox widgetDropdownBoxCollection;
     atWidgetDropDownBox widgetDropdownBoxLayer;
+
+    atWidgetDropDownBox widgetDropdownBoxRenderType;
     uint32_t objId = 0;
     bool isFirstObject = true;
-    void updateDataForNewObject(atObjectRef &objRef)
+    atRenderObjectRef renderObjRef;
+
+    void updateDataForNewObject(atObjectRef &objRef, atLevelData &levelData)
     {
         atObject *obj = objRef.resolve();
         if (isFirstObject || objId != obj->id)
@@ -122,16 +126,19 @@ struct atWidgetObjectProperties
             objId = obj->id;
             widgetDropdownBoxCollection.active = (int)objRef.collectionIndex;
             widgetDropdownBoxLayer.active = (int)objRef.layerIndex;
+
+            renderObjRef.objId = objId;
+            renderObjRef.renderLayers = &levelData.layersRenderData;
         }
     }
 
-    void draw(atObjectRef &objRef, const Rectangle &areaFull, atWidgetTheme &theme)
+    void draw(atObjectRef &objRef, const Rectangle &areaFull, atWidgetTheme &theme, atLevelData &levelData)
     {
         atObject *objPointer = objRef.resolve();
         atObjectsCollection *objCollection = objRef.resolveCollection();
         if (!objPointer || !objCollection)
             return;
-        updateDataForNewObject(objRef);
+        updateDataForNewObject(objRef, levelData);
         atObject &obj = *objPointer;
 
         const int textSizeBefore = GuiGetStyle(DEFAULT, TEXT_SIZE);
@@ -164,7 +171,7 @@ struct atWidgetObjectProperties
             DrawText(text, (int)areaForEdit.x, (int)areaForEdit.y, theme.fontSize, theme.textColor);
         };
 
-        auto drawVector2f = [&](const char *text, atWidgetEditFloat &editX, atWidgetEditFloat &editY, lwp::Vector2f& vec)
+        auto drawVector2f = [&](const char *text, atWidgetEditFloat &editX, atWidgetEditFloat &editY, lwp::Vector2f &vec)
         {
             drawTextNewLine(text);
             areaForNextElementVertical();
@@ -176,8 +183,57 @@ struct atWidgetObjectProperties
         drawVector2f("Transform:", widgetEditX, widgetEditY, obj.transform.pos);
         drawVector2f("Collider offset:", widgetEditColliderOffsetX, widgetEditColliderOffsetY, obj.collider.offset);
         drawVector2f("Collider Size:", widgetEditColliderOffsetX, widgetEditColliderOffsetY, obj.collider.size);
-        drawVector2f("Texture offset:", widgetEditTextureOffsetX, widgetEditTextureOffsetY, obj.animationData.offset);
-        drawVector2f("Texture Size:", widgetEditTextureSizeX, widgetEditTextureSizeY, obj.animationData.size);
+
+        atRenderObject *renderObjPtr = renderObjRef.resolve();
+        if (renderObjPtr == nullptr) // create!
+        {
+            areaForNextElementVertical();
+            if (GuiButton(areaForEdit, "Add render"))
+            {
+                atRenderObject renderObj;
+                renderObj.objRef = objRef;
+                renderObj.size = obj.collider.size;
+                levelData.layersRenderData[objRef.layerIndex].sprites.vec.push_back(renderObj);
+                renderObjPtr = &levelData.layersRenderData[objRef.layerIndex].sprites.vec.back(); // lol
+            }
+        }
+
+        Rectangle areaForDropDownRenderType = areaForEdit;
+        if (renderObjPtr)
+        {
+            drawVector2f("Texture offset:", widgetEditTextureOffsetX, widgetEditTextureOffsetY, renderObjPtr->offset);
+            drawVector2f("Texture Size:", widgetEditTextureSizeX, widgetEditTextureSizeY, renderObjPtr->size);
+            drawTextNewLine("Render: ");
+            areaForNextElementTryHorizontal();
+            areaForDropDownRenderType = areaForEdit;
+            areaForNextElementVertical();
+            if (GuiButton(areaForEdit, "Del render"))
+            {
+                atRenderObjectCollection *collection = renderObjRef.resolveCollection();
+                if (collection)
+                {
+                    renderObjPtr = nullptr;
+                    collection->vec.erase(collection->vec.begin() + renderObjRef.objectIndex);
+                }
+            }
+        }
+
+        if (widgetDropdownBoxRenderType.text.length() == 0)
+        {
+            if(!levelData.layersRenderData.empty())
+            {
+                for (auto &renderColection : levelData.layersRenderData.back().collections())
+                {
+                    widgetDropdownBoxRenderType.text.append(renderColection->tag.data);
+                    widgetDropdownBoxRenderType.text.append(";");
+                }
+                widgetDropdownBoxRenderType.text.data[widgetDropdownBoxRenderType.text.length() - 1] = 0;
+            }
+            else 
+            {
+                Console::log("[FAIL] render data empty widgetDropdownBoxRenderType");
+            }
+        }
 
         if (widgetDropdownBoxCollection.text.length() == 0)
         {
@@ -210,7 +266,8 @@ struct atWidgetObjectProperties
         areaForNextElementTryHorizontal();
         widgetDropdownBoxCollection.draw(areaForEdit);
         widgetDropdownBoxLayer.draw(areaForEditLayer); // reverse order not to overlay on dropdown
-
+        if (renderObjPtr)
+            widgetDropdownBoxRenderType.draw(areaForDropDownRenderType);
         GuiSetStyle(DEFAULT, TEXT_SIZE, textSizeBefore);
     }
 };
@@ -220,7 +277,7 @@ class atWidgetObjectInspector
 public:
     atWidgetObjectProperties widgetTransform;
     atWidgetTheme theme;
-    void draw(std::vector<atObjectRef> &objectsRef, Rectangle panelRect)
+    void draw(std::vector<atObjectRef> &objectsRef, Rectangle panelRect, atLevelData &levelData)
     {
         DrawRectangleRec(panelRect, theme.panelColor);
         DrawRectangleLinesEx(panelRect, 1.f, GRAY);
@@ -251,7 +308,8 @@ public:
         if (!objRef.resolve())
             return;
 
-        widgetTransform.draw(objRef, {panelRect.x + theme.gap.x, y, panelRect.width, panelRect.height}, theme);
+        widgetTransform.draw(objRef, {panelRect.x + theme.gap.x, y, panelRect.width, panelRect.height}, theme, levelData);
+
         size_t selectedCollectionIndex = (size_t)widgetTransform.widgetDropdownBoxCollection.active;
         if (selectedCollectionIndex != objRef.collectionIndex)
         {
@@ -264,6 +322,24 @@ public:
         {
             Console::log("[move layer] from {} to {}\n", objRef.layerIndex, selectedLayerIndex);
             atObjectLayers_moveObjectToLayer(objRef, selectedLayerIndex);
+
+            atRenderObjectRef &renderObjRef = widgetTransform.renderObjRef;
+            if (renderObjRef.resolve())
+            {
+                Console::log("[move render layer] from {} to {}\n", objRef.layerIndex, selectedLayerIndex);
+                atObjectLayers_moveRenderObjectToLayer(renderObjRef, selectedLayerIndex);
+            }
+        }
+
+        atRenderObjectRef &renderObjRef = widgetTransform.renderObjRef;
+        if (renderObjRef.resolve())
+        {
+            size_t selectedRenderTypeIndex = (size_t)widgetTransform.widgetDropdownBoxRenderType.active;
+            if (selectedRenderTypeIndex != renderObjRef.collectionIndex)
+            {
+                Console::log("[move render collection] from {} to {}\n", objRef.layerIndex, selectedRenderTypeIndex);
+                atObjectLayers_moveRenderObjectToCollection(renderObjRef, selectedRenderTypeIndex);
+            }
         }
     }
 };
